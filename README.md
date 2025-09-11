@@ -9,6 +9,47 @@ The project follows a sprint-based roadmap for structured development and CI/CD 
 
 A full-stack task board with user authentication (JWT), task CRUD, and responsive UI (React + Tailwind).
 
+## Repository Structure
+
+/task-board-app
+/backend → Node.js + Express + MongoDB
+/frontend → React + Vite + Tailwind
+README.md
+
+## Branching Strategy
+
+- **main** → Stable production-ready code
+- **develop** → Ongoing development branch
+- **feature/** → For new features (`feature/auth`, `feature/task-crud`)
+- **hotfix/** → For urgent fixes on `main`
+- **release/** → For preparing a version release
+
+## Contribution Workflow
+
+1. Clone the repository
+
+```bash
+   git clone https://github.com/your-username/task-board-app.git
+   cd task-board-app
+```
+
+2. Create a new branch
+
+```bash
+    git checkout -b feature/<branch-name>
+```
+
+3. Commit and push
+
+```bash
+    git add .
+    git commit -m "feat: <short description>"
+    git push origin feature/<branch-name>
+    Open a Pull Request into develop
+```
+
+4. Open a pull Request into `develop`
+
 ## Quick Start
 
 ### 1) Backend
