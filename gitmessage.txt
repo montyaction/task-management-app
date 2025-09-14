@@ -1,0 +1,24 @@
+# Conventional Commit Message Template
+# Format: <type>(<scope>): <short summary>
+# Example: feat(auth): add JWT login endpoint
+#
+# Types:
+#   feat:     A new feature
+#   fix:      A bug fix
+#   docs:     Documentation only changes
+#   style:    Changes that do not affect the code logic (formatting, missing semi-colons, etc.)
+#   refactor: Code change that neither fixes a bug nor adds a feature
+#   perf:     Code change that improves performance
+#   test:     Adding missing tests or correcting existing tests
+#   chore:    Changes to build process, configs, tools
+#
+# Scope (optional): where the change happened (e.g., backend, frontend, auth, task, board)
+# Short summary: concise description in present tense (< 72 chars)
+#
+# Commit body (optional):
+#   - Provide more details about the change
+#   - Use bullet points if needed
+#
+# Footer (optional):
+#   - Reference issues or PRs: Closes #123
+#   - BREAKING CHANGE: describe what changed and migration steps if needed
