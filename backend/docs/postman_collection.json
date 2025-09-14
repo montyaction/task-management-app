@@ -1,0 +1,513 @@
+{
+  "info": {
+    "name": "Task Management API",
+    "_postman_id": "f8c7a123-12ab-4c7a-8c1e-9876543210ab",
+    "description": "Production-ready Postman collection for Task Management Application (backend APIs). Includes Auth, Board CRUD, and Task CRUD endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for user registration and login",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"monty{{$randomInt}}\",\n  \"email\": \"monty{{$randomInt}}@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "description": "Register a new user with username, email, and password."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains user ID and message', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "    pm.expect(jsonData).to.have.property('message', 'User registered successfully');",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"monty@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "description": "Login user and retrieve JWT token."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains a token', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData.token).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Token is set as a collection variable', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.token) {",
+                  "        pm.collectionVariables.set('token', jsonData.token);",
+                  "        pm.expect(pm.collectionVariables.get('token')).to.equal(jsonData.token);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Boards",
+      "description": "CRUD operations for boards",
+      "item": [
+        {
+          "name": "Create Board",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/boards",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "boards"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Project Board\",\n  \"description\": \"Main board for tracking tasks\"\n}"
+            },
+            "description": "Create a new board with name and description."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body is valid and contains board ID', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('boardSchema'));",
+                  "    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "});",
+                  "",
+                  "pm.test('Board ID is set as a collection variable', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData._id) {",
+                  "        pm.collectionVariables.set('boardId', jsonData._id);",
+                  "        pm.expect(pm.collectionVariables.get('boardId')).to.equal(jsonData._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Board by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/boards/{{boardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "boards", "{{boardId}}"]
+            },
+            "description": "Retrieve details of a specific board."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body conforms to the board schema', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('boardSchema'));",
+                  "    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response board ID matches the requested board ID', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData._id).to.equal(pm.collectionVariables.get('boardId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Board",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/boards/{{boardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "boards", "{{boardId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Board Name\",\n  \"description\": \"Updated board description\"\n}"
+            },
+            "description": "Update board details by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body conforms to the board schema', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('boardSchema'));",
+                  "    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Board name and description are updated correctly', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.name).to.equal('Updated Board Name');",
+                  "    pm.expect(jsonData.description).to.equal('Updated board description');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Board",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/boards/{{boardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "boards", "{{boardId}}"]
+            },
+            "description": "Delete a board by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains success message', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message', 'Board deleted successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "description": "CRUD operations for tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"boardId\": \"{{boardId}}\",\n  \"title\": \"Setup GitHub Repo\",\n  \"description\": \"Initialize repo and push starter code\",\n  \"status\": \"to-do\",\n  \"priority\": \"high\"\n}"
+            },
+            "description": "Create a new task for a board."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response body is valid and contains task ID', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('taskSchema'));",
+                  "    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+                  "    pm.expect(jsonData).to.have.property('_id');",
+                  "});",
+                  "",
+                  "pm.test('Task ID is set as a collection variable', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData._id) {",
+                  "        pm.collectionVariables.set('taskId', jsonData._id);",
+                  "        pm.expect(pm.collectionVariables.get('taskId')).to.equal(jsonData._id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Retrieve all tasks for the authenticated user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array of tasks', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each item in the array conforms to the task schema', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('taskSchema'));",
+                  "    if (jsonData.length > 0) {",
+                  "        pm.expect(tv4.validate(jsonData[0], schema)).to.be.true;",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Setup GitHub Repository\",\n  \"description\": \"Initialize repository and push starter code\",\n  \"status\": \"in-progress\",\n  \"priority\": \"medium\"\n}"
+            },
+            "description": "Update a specific task by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body conforms to the task schema', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const schema = JSON.parse(pm.collectionVariables.get('taskSchema'));",
+                  "    pm.expect(tv4.validate(jsonData, schema)).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Task status and priority are updated correctly', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.equal('in-progress');",
+                  "    pm.expect(jsonData.priority).to.equal('medium');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            },
+            "description": "Delete a specific task by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response body contains success message', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message', 'Task deleted successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "boardId",
+      "value": ""
+    },
+    {
+      "key": "taskId",
+      "value": ""
+    },
+    {
+      "key": "boardSchema",
+      "value": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"_id\": { \"type\": \"string\" },\n    \"name\": { \"type\": \"string\" },\n    \"description\": { \"type\": \"string\" },\n    \"user\": { \"type\": \"string\" },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\n    \"updatedAt\": { \"type\": \"string\", \"format\": \"date-time\" }\n  },\n  \"required\": [\"_id\", \"name\", \"user\"]\n}"
+    },
+    {
+      "key": "taskSchema",
+      "value": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"_id\": { \"type\": \"string\" },\n    \"boardId\": { \"type\": \"string\" },\n    \"title\": { \"type\": \"string\" },\n    \"description\": { \"type\": \"string\" },\n    \"status\": { \"type\": \"string\", \"enum\": [\"to-do\", \"in-progress\", \"done\"] },\n    \"priority\": { \"type\": \"string\", \"enum\": [\"low\", \"medium\", \"high\"] },\n    \"user\": { \"type\": \"string\" },\n    \"createdAt\": { \"type\": \"string\", \"format\": \"date-time\" },\n    \"updatedAt\": { \"type\": \"string\", \"format\": \"date-time\" }\n  },\n  \"required\": [\"_id\", \"boardId\", \"title\", \"status\", \"user\"]\n}"
+    }
+  ]
+}
