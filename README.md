@@ -20,9 +20,11 @@ README.md
 
 - **main** → Stable production-ready code
 - **develop** → Ongoing development branch
+- **chore** → For maintenance task
 - **feature/** → For new features (`feature/auth`, `feature/task-crud`)
 - **hotfix/** → For urgent fixes on `main`
 - **release/** → For preparing a version release
+- **refactor** → For improves internal code structure without changing behavior
 
 ## Contribution Workflow
 
