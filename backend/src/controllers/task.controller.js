@@ -2,14 +2,19 @@ import Task from "../models/Task.js";
 
 export const createTask = async (req, res, next) => {
   try {
-    const { title, description = "", status = "to-do", priority = "medium" } = req.body;
+    const {
+      title,
+      description = "",
+      status = "to-do",
+      priority = "medium",
+    } = req.body;
     if (!title) return res.status(400).json({ message: "Title is required" });
     const task = await Task.create({
       title,
       description,
       status,
       priority,
-      user_id: req.user.id
+      user_id: req.user.id,
     });
     res.status(201).json(task);
   } catch (err) {
@@ -19,7 +24,9 @@ export const createTask = async (req, res, next) => {
 
 export const getTasks = async (req, res, next) => {
   try {
-    const tasks = await Task.find({ user_id: req.user.id }).sort({ updatedAt: -1 });
+    const tasks = await Task.find({ user_id: req.user.id }).sort({
+      updatedAt: -1,
+    });
     res.json(tasks);
   } catch (err) {
     next(err);
@@ -33,7 +40,7 @@ export const updateTask = async (req, res, next) => {
       ...(title !== undefined ? { title } : {}),
       ...(description !== undefined ? { description } : {}),
       ...(status !== undefined ? { status } : {}),
-      ...(priority !== undefined ? { priority } : {})
+      ...(priority !== undefined ? { priority } : {}),
     }))(req.body);
 
     const updated = await Task.findOneAndUpdate(
@@ -51,9 +58,12 @@ export const updateTask = async (req, res, next) => {
 export const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const deleted = await Task.findOneAndDelete({ _id: id, user_id: req.user.id });
+    const deleted = await Task.findOneAndDelete({
+      _id: id,
+      user_id: req.user.id,
+    });
     if (!deleted) return res.status(404).json({ message: "Task not found" });
-    res.json({ message: "Deleted" });
+    res.json({ message: "Task deleted successfully" });
   } catch (err) {
     next(err);
   }
