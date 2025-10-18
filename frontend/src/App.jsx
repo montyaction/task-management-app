@@ -1,17 +1,22 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuthStore } from "./stores/authStore.js";
+
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 
 const PrivateRoute = ({ children }) => {
-  const { token } = useAuth();
+  const { token, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return <p>Loading...</p>;   // Show a loading indicator while auth is being checked
+  }
+
   return token ? children : <Navigate to="/login" replace />;
 };
 
 export default function App() {
   return (
-    <AuthProvider>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<LoginPage />} />
@@ -25,7 +30,6 @@ export default function App() {
           }
         />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </AuthProvider>
+    </Routes>
   );
-}
+};

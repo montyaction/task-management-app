@@ -1,32 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
-import { api } from "../lib/api.js";
+import { useAuthStore } from "../stores/authStore.js";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setToken, setUser } = useAuth();
+  const { login, isLoading } = useAuthStore();
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    try {
-      const res = await api("/api/auth/login", {
-        method: "POST",
-        body: { identifier, password }
-      });
-      setToken(res.token);
-      setUser(res.user);
+
+    const credentials = { identifier, password };
+
+    const result = await login(credentials);
+    console.log(result);
+
+    if (result.success) {
       navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
   };
 
@@ -56,8 +52,8 @@ export default function LoginPage() {
             />
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button className="btn w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+          <button className="btn w-full" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign in"}
           </button>
         </form>
         <p className="text-sm text-center mt-4">

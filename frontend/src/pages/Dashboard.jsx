@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
-import { api } from "../lib/api.js";
+import { useAuthStore } from "../stores/authStore.js";
+import { useTaskStore } from "../stores/taskStore.js";
 import TaskBoard from "../components/TaskBoard.jsx";
 import TaskFormModal from "../components/TaskFormModal.jsx";
 
 export default function Dashboard() {
-  const { token, user, logout } = useAuth();
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { token, user, logout } = useAuthStore();
+  const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();   // From Zustand
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
   const load = async () => {
-    setLoading(true);
-    setError("");
+    // setLoading(true);
+    // setError("");
     try {
-      const data = await api("/api/tasks", { token });
-      setTasks(data);
+      // const data = await api("/api/tasks", { token });
+      // addTask(data);
+      fetchTasks();
     } catch (err) {
-      setError(err.message);
+      // setError(err.message);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -36,21 +36,30 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  const createTask = async (payload) => {
-    await api("/api/tasks", { method: "POST", body: payload, token });
-    setModalOpen(false);
-    await load();
+  const handleAddTask = async (taskData) => {
+    const result = await addTask(taskData);
+    if (result.success) {
+      setModalOpen(false);
+    } else {
+      // Handle error, maybe display to user
+      console.error("Error adding task:", result.error);
+    }
   };
 
-  const updateTask = async (id, payload) => {
-    await api(`/api/tasks/${id}`, { method: "PUT", body: payload, token });
-    setEditing(null);
-    await load();
+  const handleUpdateTask = async (taskId, updatedData) => {
+    const result = await updateTask(taskId, updatedData);
+    if (result.success) {
+      setModalOpen(false);
+      setEditing(null);
+    } else {
+      console.error("Error updating task:", result.error);
+    }
   };
 
-  const deleteTask = async (id) => {
-    await api(`/api/tasks/${id}`, { method: "DELETE", token });
-    await load();
+  const handleDeleteTask = async (taskId) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      await deleteTask(taskId);
+    }
   };
 
   return (
@@ -61,7 +70,7 @@ export default function Dashboard() {
           <p className="text-sm text-gray-600">Welcome, {user?.username}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-outline" onClick={load}>Refresh</button>
+          <button className="btn-outline" onClick={fetchTasks}>Refresh</button>
           <button className="btn" onClick={logout}>Logout</button>
         </div>
       </header>
@@ -74,21 +83,21 @@ export default function Dashboard() {
           tasks={tasks}
           onCreateClick={() => setModalOpen(true)}
           onEdit={(t) => { setEditing(t); }}
-          onDelete={deleteTask}
+            onDelete={handleDeleteTask}
         />
       )}
 
       <TaskFormModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={createTask}
+        onSubmit={handleAddTask}
       />
 
       <TaskFormModal
         open={!!editing}
         initial={editing}
         onClose={() => setEditing(null)}
-        onSubmit={(payload) => updateTask(editing._id, payload)}
+        onSubmit={(payload) => handleUpdateTask(editing._id, payload)}
       />
     </div>
   );

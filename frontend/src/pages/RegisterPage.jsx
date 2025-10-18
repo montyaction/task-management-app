@@ -1,33 +1,33 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext.jsx";
-import { api } from "../lib/api.js";
+import { useAuthStore } from "../stores/authStore.js";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { setToken, setUser } = useAuth();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { register, isLoading, token } = useAuthStore();
+
+  if (token) {
+    navigator("/dashboard");
+    return null;  // Component ko render hone se rokein
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    try {
-      const res = await api("/api/auth/register", {
-        method: "POST",
-        body: { username, email, password }
-      });
-      setToken(res.token);
-      setUser(res.user);
+
+    const userData = { username, email, password };
+
+    const result = await register(userData);
+
+    if (result.success) {
       navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
   };
 
@@ -67,8 +67,8 @@ export default function RegisterPage() {
             />
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button className="btn w-full" disabled={loading}>
-            {loading ? "Creating..." : "Create account"}
+          <button className="btn w-full" disabled={isLoading}>
+            {isLoading ? "Creating..." : "Create account"}
           </button>
         </form>
         <p className="text-sm text-center mt-4">
