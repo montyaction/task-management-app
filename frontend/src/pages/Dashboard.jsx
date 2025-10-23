@@ -1,59 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
 import { useTaskStore } from "../stores/taskStore.js";
+import { useUIStore } from "../stores/uiStore.js";
 import TaskBoard from "../components/TaskBoard.jsx";
 import TaskFormModal from "../components/TaskFormModal.jsx";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { token, user, logout } = useAuthStore();
-  const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();   // From Zustand
+  const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();
+  const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-
-  const load = async () => {
-    // setLoading(true);
-    // setError("");
-    try {
-      // const data = await api("/api/tasks", { token });
-      // addTask(data);
-      fetchTasks();
-    } catch (err) {
-      // setError(err.message);
-    } finally {
-      // setLoading(false);
-    }
-  };
-
+  // Redirect if not logged in
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
-    load();
+    fetchTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, fetchTasks, navigate]);
 
+  // CRUD actions
   const handleAddTask = async (taskData) => {
-    const result = await addTask(taskData);
-    if (result.success) {
-      setModalOpen(false);
-    } else {
-      // Handle error, maybe display to user
-      console.error("Error adding task:", result.error);
-    }
+    await addTask(taskData);
+    closeModal("taskForm");
   };
 
   const handleUpdateTask = async (taskId, updatedData) => {
-    const result = await updateTask(taskId, updatedData);
-    if (result.success) {
-      setModalOpen(false);
-      setEditing(null);
-    } else {
-      console.error("Error updating task:", result.error);
-    }
+    await updateTask(taskId, updatedData);
+    clearEditingTask();
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -76,29 +53,34 @@ export default function Dashboard() {
       </header>
 
       {error && <p className="text-red-600 mb-3">{error}</p>}
+
       {loading ? (
         <p>Loading...</p>
       ) : (
         <TaskBoard
           tasks={tasks}
-          onCreateClick={() => setModalOpen(true)}
-          onEdit={(t) => { setEditing(t); }}
-            onDelete={handleDeleteTask}
+          onCreateClick={() => openModal("taskForm")}
+          onEdit={setEditingTask}
+          onDelete={handleDeleteTask}
         />
       )}
 
+      {/* Task Creation Modal */}
       <TaskFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={modals.taskForm}
+        onClose={() => closeModal("taskForm")}
         onSubmit={handleAddTask}
       />
 
-      <TaskFormModal
-        open={!!editing}
-        initial={editing}
-        onClose={() => setEditing(null)}
-        onSubmit={(payload) => handleUpdateTask(editing._id, payload)}
-      />
+      {/* Task Editing Modal */}
+      {editingTask && (
+        <TaskFormModal
+        open={!!editingTask}
+        initial={editingTask}
+        onClose={clearEditingTask}
+        onSubmit={(payload) => handleUpdateTask(editingTask._id, payload)}
+        />
+      )}
     </div>
   );
 }
