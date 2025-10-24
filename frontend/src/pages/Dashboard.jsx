@@ -10,7 +10,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { token, user, logout } = useAuthStore();
   const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();
-  const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
+  const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask, resetUI } = useUIStore();
 
   // Redirect if not logged in
   useEffect(() => {
@@ -39,6 +39,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    resetUI();
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto">
       <header className="flex items-center justify-between mb-6">
@@ -48,7 +53,7 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-outline" onClick={fetchTasks}>Refresh</button>
-          <button className="btn" onClick={logout}>Logout</button>
+          <button className="btn" onClick={handleLogout}>Logout</button>
         </div>
       </header>
 
