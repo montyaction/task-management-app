@@ -10,7 +10,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { token, user, logout } = useAuthStore();
   const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask } = useTaskStore();
-  const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask, resetUI } = useUIStore();
+  const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
 
   // Redirect if not logged in
   useEffect(() => {
@@ -41,7 +41,6 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     logout();
-    resetUI();
   };
 
   return (

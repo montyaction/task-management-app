@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import apiClient from "../lib/apiClient";
+import { useUIStore } from "./uiStore";
 
 // Helper function to get initial data from localStorage (Lazy Initialization)
 const getInitialAuthState = () => {
@@ -77,5 +78,6 @@ export const useAuthStore = create((set) => ({
 
         // State clear karna
         set({ token: null, user: null });
+        useUIStore.getState().resetUI();    // auto-reset UI
       },
 }));
