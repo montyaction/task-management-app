@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
+import { seedStarterTasksForUser } from "../services/starterTasks.service.js";
 
 const normalizeIdentifier = (value = "") => value.trim();
 
@@ -52,6 +53,7 @@ export const register = async (req, res, next) => {
       password: hash,
       avatarUrl: normalizedAvatarUrl
     });
+    await seedStarterTasksForUser(user._id);
     const token = generateToken(user._id.toString());
     res.status(201).json({
       token,
