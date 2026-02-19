@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
+import UserAvatar from "./UserAvatar.jsx";
 
 const navLinkClass = ({ isActive }) =>
   `text-sm font-medium transition-colors ${
@@ -24,9 +25,13 @@ export default function SiteHeader() {
             <NavLink to="/dashboard" className={navLinkClass}>
               Dashboard
             </NavLink>
-            <p className="hidden text-sm text-slate-600 md:block">
-              Signed in as <span className="font-medium text-slate-900">{user?.username || user?.email}</span>
-            </p>
+            <NavLink to="/profile" className={navLinkClass}>
+              Profile
+            </NavLink>
+            <Link to="/profile" className="flex items-center gap-2 rounded-full border border-slate-200 px-2 py-1 hover:bg-slate-50">
+              <UserAvatar user={user} sizeClass="h-8 w-8" textClass="text-xs" />
+              <span className="hidden text-sm text-slate-700 md:inline">{user?.username || user?.email}</span>
+            </Link>
             <button className="btn-outline" onClick={logout}>
               Logout
             </button>
@@ -45,4 +50,3 @@ export default function SiteHeader() {
     </header>
   );
 }
-

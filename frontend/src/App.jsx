@@ -4,15 +4,12 @@ import { useAuthStore } from "./stores/authStore.js";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import RouteChangeHandler from "./components/RouteChangeHandler.jsx";
 import AppLayout from "./components/AppLayout.jsx";
 
 const PrivateRoute = ({ children }) => {
-  const { token, isLoading } = useAuthStore();
-
-  if (isLoading) {
-    return <p>Loading...</p>;   // Show a loading indicator while auth is being checked
-  }
+  const { token } = useAuthStore();
 
   return token ? children : <Navigate to="/login" replace />;
 };
@@ -31,6 +28,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
               </PrivateRoute>
             }
           />

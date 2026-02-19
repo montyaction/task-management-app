@@ -4,80 +4,119 @@ import { useUIStore } from "./uiStore";
 
 // Helper function to get initial data from localStorage (Lazy Initialization)
 const getInitialAuthState = () => {
-    try {
-        const storedToken = localStorage.getItem("token") || null;
-        const userJSON = localStorage.getItem("user");
-        const storedUser = userJSON ? JSON.parse(userJSON) : null;
+  try {
+    const storedToken = localStorage.getItem("token") || null;
+    const userJSON = localStorage.getItem("user");
+    const storedUser = userJSON ? JSON.parse(userJSON) : null;
 
-        if (storedToken && storedUser) {
-            apiClient.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-            return { storedToken, storedUser };
-        }
-    } catch (error) {
-        // Agar parsing main error aaye to local storage clear kar dein
-        localStorage.clear();
+    if (storedToken && storedUser) {
+      apiClient.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+      return { storedToken, storedUser };
     }
-    return { storedToken: null, storedUser: null };
+  } catch {
+    localStorage.clear();
+  }
+  return { storedToken: null, storedUser: null };
 };
 
-export const useAuthStore = create((set) => ({
-    // 1. Initial State (Lazy Initialization yahan ho rahi hai)
-    token: getInitialAuthState().storedToken,
-    user: getInitialAuthState().storedUser,
-    isLoading: false,
+const persistSession = (token, user) => {
+  if (token && user) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    return;
+  }
 
-    // 2. Actions (Functions)
-    register: async (credentials) => {
-        set({ isLoading: true });
-        try {
-            // Register API endpoint ko call karein
-            const { data } = await apiClient.post("/api/auth/register", credentials);
-            const { token, user } = data;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  delete apiClient.defaults.headers.common["Authorization"];
+};
 
-            // LocalStorage aur API headers set karein (auto-login)
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(user));
-            apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+const initialAuth = getInitialAuthState();
 
-            // State update karein
-            set({ token, user, isLoading: false });
-            return { success: true };
-        } catch (error) {
-            set({ isLoading: false });
-            return { success: false, error: error.response?.data?.message || "Registration failed" };
-        }
-    },
+export const useAuthStore = create((set, get) => ({
+  token: initialAuth.storedToken,
+  user: initialAuth.storedUser,
+  isLoading: false,
 
-    login: async (credentials) => {
-        set({ isLoading: true });
-        try {
-            const { data } = await apiClient.post("/api/auth/login", credentials);
-            const { token, user } = data;
+  register: async (credentials) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await apiClient.post("/api/auth/register", credentials);
+      const { token, user } = data;
 
-            // LocalStorage aur API headers set karna
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(user));
-            apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      persistSession(token, user);
+      set({ token, user, isLoading: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false });
+      return { success: false, error: error.response?.data?.message || "Registration failed" };
+    }
+  },
 
-            // State update karna
-            set({ token, user, isLoading: false });
-            return { success: true };
-        } catch (error) {
-            // Failure par sab kuch clear kar dena
-            localStorage.clear();
-            delete apiClient.defaults.headers.common["Authorization"];
-            set({ token: null, user: null, isLoading: false });
-            return { success: false, error: error.response?.data?.message || "Login failed" };
-        }
-    },
+  login: async (credentials) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await apiClient.post("/api/auth/login", credentials);
+      const { token, user } = data;
 
-    logout: () => {
-        // LocalStorage aur API headers clear karna
-        localStorage.clear();
-        delete apiClient.defaults.headers.common["Authorization"];
+      persistSession(token, user);
+      set({ token, user, isLoading: false });
+      return { success: true };
+    } catch (error) {
+      persistSession(null, null);
+      set({ token: null, user: null, isLoading: false });
+      return { success: false, error: error.response?.data?.message || "Login failed" };
+    }
+  },
 
-        // State clear karna
-        set({ token: null, user: null });
-        useUIStore.getState().resetUI();    // auto-reset UI
-      },
+  fetchProfile: async () => {
+    if (!get().token) return { success: false, error: "Not authenticated" };
+
+    set({ isLoading: true });
+    try {
+      const { data } = await apiClient.get("/api/auth/profile");
+      const nextUser = data?.user ?? null;
+      if (!nextUser) {
+        set({ isLoading: false });
+        return { success: false, error: "Invalid profile response" };
+      }
+      const currentToken = get().token;
+
+      persistSession(currentToken, nextUser);
+      set({ user: nextUser, isLoading: false });
+      return { success: true, user: nextUser };
+    } catch (error) {
+      set({ isLoading: false });
+      return { success: false, error: error.response?.data?.message || "Failed to fetch profile" };
+    }
+  },
+
+  updateProfile: async (payload) => {
+    if (!get().token) return { success: false, error: "Not authenticated" };
+
+    set({ isLoading: true });
+    try {
+      const { data } = await apiClient.put("/api/auth/profile", payload);
+      const nextUser = data?.user ?? null;
+      if (!nextUser) {
+        set({ isLoading: false });
+        return { success: false, error: "Invalid profile response" };
+      }
+      const currentToken = get().token;
+
+      persistSession(currentToken, nextUser);
+      set({ user: nextUser, isLoading: false });
+      return { success: true, user: nextUser };
+    } catch (error) {
+      set({ isLoading: false });
+      return { success: false, error: error.response?.data?.message || "Failed to update profile" };
+    }
+  },
+
+  logout: () => {
+    persistSession(null, null);
+    set({ token: null, user: null });
+    useUIStore.getState().resetUI();
+  }
 }));
