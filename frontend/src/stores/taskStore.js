@@ -74,4 +74,13 @@ export const useTaskStore = create((set) => ({
     // 5. Clear all tasks (e.g., on logout)
     clearTasks: () => set({ tasks: [], loading: false, error: null }),
 
+    // 6. Persist reordered tasks to backend
+    reorderTasksPersist: async (tasks) => {
+        try {
+            await apiClient.put(`${API_BASE_URL}/reorder/bulk`, { tasks });
+        } catch (error) {
+            console.error("Failed to persist task order", error);
+        }
+    },
+
 }));
