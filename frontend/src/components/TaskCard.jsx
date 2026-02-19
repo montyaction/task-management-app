@@ -22,11 +22,27 @@ const formatUpdatedAt = (value) => {
   return `Updated ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 };
 
-function TaskCard({ task, onEdit, onDelete }) {
+function TaskCard({ task, onEdit, onDelete, selected = false, onSelect }) {
   const priority = PRIORITY_MAP[task.priority] || PRIORITY_MAP.medium;
+  const handleCardKeyDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onSelect?.();
+    }
+  };
 
   return (
-    <article className="group mb-2 rounded-2xl border border-slate-200/90 bg-white px-4 py-3.5 shadow-sm transition hover:-translate-y-px hover:shadow-md">
+    <article
+      className={`mb-2 rounded-2xl border bg-white px-4 py-3.5 shadow-sm transition hover:-translate-y-px hover:shadow-md ${
+        selected ? "border-sky-300 ring-2 ring-sky-100" : "border-slate-200/90"
+      }`}
+      onClick={onSelect}
+      onKeyDown={handleCardKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h4 className="break-words text-sm font-semibold text-slate-900 sm:text-base">{task.title}</h4>
@@ -43,14 +59,32 @@ function TaskCard({ task, onEdit, onDelete }) {
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs text-slate-500">{formatUpdatedAt(task.updatedAt)}</p>
-        <div className="flex gap-2 transition-all duration-200 md:translate-y-1 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100">
-          <button className="btn-outline px-2.5 py-1 text-[11px]" onClick={() => onEdit(task)}>
-            Edit
-          </button>
-          <button className="btn-danger" onClick={() => onDelete(task._id)}>
-            Delete
-          </button>
-        </div>
+        {selected ? (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="btn-outline px-2.5 py-1 text-[11px]"
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(task);
+              }}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              className="btn-danger"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(task._id);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ) : (
+          <p className="text-[11px] text-slate-400">Select to manage</p>
+        )}
       </div>
     </article>
   );

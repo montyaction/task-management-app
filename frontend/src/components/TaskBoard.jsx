@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import TaskCard from "./TaskCard.jsx";
 import { DndContext, PointerSensor, closestCorners, pointerWithin, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -29,6 +29,7 @@ const COLUMNS = [
 ];
 
 function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const orderedTasks = useMemo(
     () => [...tasks].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
     [tasks]
@@ -52,6 +53,19 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
   const collisionDetection = useCallback((args) => {
     const pointerCollisions = pointerWithin(args);
     return pointerCollisions.length > 0 ? pointerCollisions : closestCorners(args);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedTaskId) return;
+    const stillExists = orderedTasks.some((task) => String(task._id) === selectedTaskId);
+    if (!stillExists) {
+      setSelectedTaskId(null);
+    }
+  }, [orderedTasks, selectedTaskId]);
+
+  const handleSelectTask = useCallback((taskId) => {
+    const nextId = String(taskId);
+    setSelectedTaskId((prev) => (prev === nextId ? null : nextId));
   }, []);
 
   const handleDragEnd = useCallback(
@@ -99,7 +113,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
 
   return (
     <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={handleDragEnd}>
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {COLUMNS.map((col) => (
           <Column
             key={col.key}
@@ -108,6 +122,8 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
             onCreateClick={onCreateClick}
             onEdit={onEdit}
             onDelete={onDelete}
+            selectedTaskId={selectedTaskId}
+            onSelectTask={handleSelectTask}
           />
         ))}
       </div>
@@ -115,7 +131,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
   );
 }
 
-function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete }) {
+function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.key });
   const itemIds = useMemo(() => items.map((task) => String(task._id)), [items]);
 
@@ -147,7 +163,14 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete }) {
       >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {items.map((task) => (
-            <SortableTask key={task._id} task={task} onEdit={onEdit} onDelete={onDelete} />
+            <SortableTask
+              key={task._id}
+              task={task}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              selectedTaskId={selectedTaskId}
+              onSelectTask={onSelectTask}
+            />
           ))}
         </SortableContext>
 
@@ -163,10 +186,11 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete }) {
 
 const Column = memo(ColumnComponent);
 
-function SortableTaskComponent({ task, onEdit, onDelete }) {
+function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: String(task._id)
   });
+  const isSelected = selectedTaskId === String(task._id);
 
   const style = useMemo(
     () => ({
@@ -185,7 +209,13 @@ function SortableTaskComponent({ task, onEdit, onDelete }) {
       {...listeners}
       className={`transition ${isDragging ? "scale-[1.01] opacity-90" : "opacity-100"}`}
     >
-      <TaskCard task={task} onEdit={onEdit} onDelete={onDelete} />
+      <TaskCard
+        task={task}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        selected={isSelected}
+        onSelect={() => onSelectTask(task._id)}
+      />
     </div>
   );
 }

@@ -171,7 +171,10 @@ export default function Dashboard() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Workspace</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">Team Dashboard</h1>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+              <span className="sm:hidden">Workspace</span>
+              <span className="hidden sm:inline">Team Workspace</span>
+            </h1>
             <p className="mt-1 text-sm text-slate-600">
               Welcome back, {user?.username || user?.email}. Review priorities and keep the workflow moving.
             </p>
