@@ -3,6 +3,7 @@ import apiClient from "../lib/apiClient";
 
 // Base URL for your backend tasks API
 const API_BASE_URL = '/api/tasks';
+const STATUS_ORDER = { "to-do": 0, "in-progress": 1, completed: 2 };
 
 export const useTaskStore = create((set) => ({
     tasks: [],
@@ -74,12 +75,40 @@ export const useTaskStore = create((set) => ({
     // 5. Clear all tasks (e.g., on logout)
     clearTasks: () => set({ tasks: [], loading: false, error: null }),
 
-    // 6. Persist reordered tasks to backend
+    // 6. Apply local reorder optimistically for snappier UI.
+    applyTaskReorder: (updates) =>
+        set((state) => {
+            if (!Array.isArray(updates) || updates.length === 0) return {};
+            const updateMap = new Map(
+                updates.map((item) => [
+                    String(item._id),
+                    { status: item.status, position: item.position }
+                ])
+            );
+
+            const nextTasks = state.tasks
+                .map((task) => {
+                    const patch = updateMap.get(String(task._id));
+                    if (!patch) return task;
+                    return { ...task, status: patch.status, position: patch.position };
+                })
+                .sort((a, b) => {
+                    const statusDiff = (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99);
+                    if (statusDiff !== 0) return statusDiff;
+                    return (a.position ?? 0) - (b.position ?? 0);
+                });
+
+            return { tasks: nextTasks };
+        }),
+
+    // 7. Persist reordered tasks to backend
     reorderTasksPersist: async (tasks) => {
         try {
             await apiClient.put(`${API_BASE_URL}/reorder/bulk`, { tasks });
+            return { success: true };
         } catch (error) {
             console.error("Failed to persist task order", error);
+            return { success: false, error: error.response?.data?.message || "Failed to reorder tasks" };
         }
     },
 

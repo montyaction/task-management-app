@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
 import { useTaskStore } from "../stores/taskStore.js";
@@ -6,10 +6,12 @@ import { useUIStore } from "../stores/uiStore.js";
 import TaskBoard from "../components/TaskBoard.jsx";
 import TaskFormModal from "../components/TaskFormModal.jsx";
 
+const sortByPosition = (list) => [...list].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { token, user, logout } = useAuthStore();
-  const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask, reorderTasksPersist } = useTaskStore();
+  const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask, applyTaskReorder, reorderTasksPersist } = useTaskStore();
   const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
 
   // Redirect if not logged in
@@ -23,26 +25,32 @@ export default function Dashboard() {
   }, [token, fetchTasks, navigate]);
 
   // CRUD actions
-  const handleAddTask = async (taskData) => {
+  const handleAddTask = useCallback(async (taskData) => {
     await addTask(taskData);
     closeModal("taskForm");
-  };
+  }, [addTask, closeModal]);
 
-  const handleUpdateTask = async (taskId, updatedData) => {
+  const handleUpdateTask = useCallback(async (taskId, updatedData) => {
     await updateTask(taskId, updatedData);
     clearEditingTask();
-  };
+  }, [clearEditingTask, updateTask]);
 
-  const handleDeleteTask = async (taskId) => {
+  const handleDeleteTask = useCallback(async (taskId) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       await deleteTask(taskId);
     }
-  };
+  }, [deleteTask]);
 
-  const sortByPosition = (list) => [...list].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const handleOpenTaskForm = useCallback(() => {
+    openModal("taskForm");
+  }, [openModal]);
+
+  const handleCloseTaskForm = useCallback(() => {
+    closeModal("taskForm");
+  }, [closeModal]);
 
   // Handle drag end from board (dnd-kit payload from TaskBoard)
-  const handleDragEnd = async ({
+  const handleDragEnd = useCallback(async ({
     sourceStatus,
     sourceIndex,
     destinationStatus,
@@ -63,8 +71,11 @@ export default function Dashboard() {
         position: idx
       }));
 
-      await reorderTasksPersist(payload);
-      await fetchTasks();
+      applyTaskReorder(payload);
+      const result = await reorderTasksPersist(payload);
+      if (!result?.success) {
+        await fetchTasks();
+      }
       return;
     }
 
@@ -87,13 +98,16 @@ export default function Dashboard() {
       }))
     ];
 
-    await reorderTasksPersist(payload);
-    await fetchTasks();
-  };
+    applyTaskReorder(payload);
+    const result = await reorderTasksPersist(payload);
+    if (!result?.success) {
+      await fetchTasks();
+    }
+  }, [applyTaskReorder, fetchTasks, reorderTasksPersist, tasks]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
-  };
+  }, [logout]);
 
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto">
@@ -115,7 +129,7 @@ export default function Dashboard() {
       ) : (
         <TaskBoard
           tasks={tasks}
-          onCreateClick={() => openModal("taskForm")}
+          onCreateClick={handleOpenTaskForm}
           onEdit={setEditingTask}
           onDragEnd={handleDragEnd}
           onDelete={handleDeleteTask}
@@ -125,7 +139,7 @@ export default function Dashboard() {
       {/* Task Creation Modal */}
       <TaskFormModal
         open={modals.taskForm}
-        onClose={() => closeModal("taskForm")}
+        onClose={handleCloseTaskForm}
         onSubmit={handleAddTask}
       />
 

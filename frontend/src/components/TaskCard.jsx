@@ -1,4 +1,6 @@
-export default function TaskCard({ task, onEdit, onDelete }) {
+import { memo } from "react";
+
+function TaskCard({ task, onEdit, onDelete }) {
   return (
     <div className="card mb-3">
       <div className="flex items-start justify-between">
@@ -17,3 +19,5 @@ export default function TaskCard({ task, onEdit, onDelete }) {
     </div>
   );
 }
+
+export default memo(TaskCard);
