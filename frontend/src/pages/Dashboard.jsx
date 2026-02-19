@@ -140,28 +140,28 @@ export default function Dashboard() {
       label: "Total Tasks",
       value: stats.total,
       hint: `${stats.highPriority} high priority`,
-      tone: "border-sky-200 bg-sky-50/70 text-sky-900"
+      tone: "border-sky-200 bg-sky-50/70 text-sky-900 dark:border-sky-500/40 dark:bg-sky-500/15 dark:text-sky-100"
     },
     {
       key: "to-do",
       label: STATUS_LABELS["to-do"],
       value: stats.byStatus["to-do"],
       hint: "Planned work",
-      tone: "border-indigo-200 bg-indigo-50/70 text-indigo-900"
+      tone: "border-indigo-200 bg-indigo-50/70 text-indigo-900 dark:border-indigo-500/40 dark:bg-indigo-500/15 dark:text-indigo-100"
     },
     {
       key: "in-progress",
       label: STATUS_LABELS["in-progress"],
       value: stats.byStatus["in-progress"],
       hint: "Active now",
-      tone: "border-amber-200 bg-amber-50/70 text-amber-900"
+      tone: "border-amber-200 bg-amber-50/70 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-100"
     },
     {
       key: "completed",
       label: STATUS_LABELS.completed,
       value: stats.byStatus.completed,
       hint: "Shipped tasks",
-      tone: "border-emerald-200 bg-emerald-50/70 text-emerald-900"
+      tone: "border-emerald-200 bg-emerald-50/70 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/15 dark:text-emerald-100"
     }
   ];
 
@@ -170,12 +170,12 @@ export default function Dashboard() {
       <header className="surface fade-up p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Workspace</p>
-            <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Workspace</p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100 sm:text-3xl">
               <span className="sm:hidden">Workspace</span>
               <span className="hidden sm:inline">Team Workspace</span>
             </h1>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
               Welcome back, {user?.username || user?.email}. Review priorities and keep the workflow moving.
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
       </header>
 
       {error && (
-        <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-950/45 dark:text-rose-200">
           {error}
         </p>
       )}
@@ -211,10 +211,10 @@ export default function Dashboard() {
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, idx) => (
             <div key={idx} className="surface h-56 animate-pulse p-4">
-              <div className="h-4 w-24 rounded bg-slate-200" />
+              <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-700" />
               <div className="mt-4 space-y-3">
-                <div className="h-16 rounded-xl bg-slate-100" />
-                <div className="h-16 rounded-xl bg-slate-100" />
+                <div className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800" />
+                <div className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800" />
               </div>
             </div>
           ))}

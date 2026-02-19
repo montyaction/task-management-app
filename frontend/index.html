@@ -3,6 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        try {
+          const storedTheme = localStorage.getItem("theme");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const mode = storedTheme === "dark" || storedTheme === "light" || storedTheme === "system"
+            ? storedTheme
+            : "system";
+          const resolvedTheme = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+          document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+          document.documentElement.style.colorScheme = resolvedTheme;
+        } catch (_) {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.style.colorScheme = "light";
+        }
+      })();
+    </script>
     <title>Task Management Application</title>
   </head>
   <body>

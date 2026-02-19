@@ -8,6 +8,11 @@
   --brand-500: 14 165 233;
   --brand-600: 2 132 199;
   --accent-500: 16 185 129;
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
 }
 
 @layer base {
@@ -18,12 +23,20 @@
   }
 
   body {
-    @apply text-slate-900 antialiased;
+    @apply text-slate-900 antialiased transition-colors duration-300;
     font-family: "DM Sans", "Segoe UI", sans-serif;
     background:
       radial-gradient(1100px 560px at -15% -20%, rgb(14 165 233 / 0.22), transparent 58%),
       radial-gradient(900px 520px at 120% -15%, rgb(16 185 129 / 0.2), transparent 52%),
       linear-gradient(180deg, #f8fbff 0%, #f4f8fe 38%, #eef8f3 100%);
+  }
+
+  .dark body {
+    @apply text-slate-100;
+    background:
+      radial-gradient(1200px 680px at -18% -24%, rgb(56 189 248 / 0.22), transparent 52%),
+      radial-gradient(960px 560px at 120% -10%, rgb(52 211 153 / 0.16), transparent 54%),
+      linear-gradient(180deg, #061321 0%, #0a1a2e 36%, #0b1f24 100%);
   }
 
   h1,
@@ -39,7 +52,7 @@
 
 @layer components {
   .surface {
-    @apply rounded-3xl border border-white/80 bg-white/80 shadow-[0_22px_60px_-35px_rgba(2,132,199,0.45)] backdrop-blur;
+    @apply rounded-3xl border border-white/80 bg-white/80 shadow-[0_22px_60px_-35px_rgba(2,132,199,0.45)] backdrop-blur dark:border-slate-700/80 dark:bg-slate-900/75 dark:shadow-[0_30px_70px_-40px_rgba(2,8,23,0.9)];
   }
 
   .card {
@@ -60,35 +73,35 @@
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow;
+    @apply inline-flex items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-semibold text-slate-700 shadow-sm transition duration-200 hover:-translate-y-px hover:border-slate-300 hover:bg-slate-50 hover:shadow dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-600 dark:hover:bg-slate-800;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-1 rounded-xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900;
+    @apply inline-flex items-center justify-center gap-1 rounded-xl px-2.5 py-1.5 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100;
+    @apply inline-flex items-center justify-center gap-1 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/40 dark:bg-rose-950/40 dark:text-rose-200 dark:hover:bg-rose-900/50;
   }
 
   .input {
-    @apply w-full rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-200;
+    @apply w-full rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-sky-500 dark:focus:ring-sky-500/30;
   }
 
   .input:disabled {
-    @apply cursor-not-allowed bg-slate-100 text-slate-500;
+    @apply cursor-not-allowed bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400;
   }
 
   .label {
-    @apply mb-1 block text-sm font-medium text-slate-700;
+    @apply mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300;
   }
 
   .field-hint {
-    @apply mt-1 text-xs text-slate-500;
+    @apply mt-1 text-xs text-slate-500 dark:text-slate-400;
   }
 
   .badge {
-    @apply inline-flex items-center rounded-full border border-slate-200 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide;
+    @apply inline-flex items-center rounded-full border border-slate-200 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-200;
   }
 
   .fade-up {

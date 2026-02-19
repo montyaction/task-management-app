@@ -87,9 +87,9 @@ export default function ProfilePage() {
   return (
     <div className="space-y-5">
       <header className="surface fade-up p-5 sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Account</p>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">Your Profile</h1>
-        <p className="mt-1 text-sm text-slate-600">Manage your account details and avatar used across the app.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Account</p>
+        <h1 className="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">Your Profile</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Manage your account details and avatar used across the app.</p>
       </header>
 
       <div className="grid gap-5 lg:grid-cols-[290px_1fr]">
@@ -97,25 +97,25 @@ export default function ProfilePage() {
           <div className="flex flex-col items-center gap-3 text-center">
             <UserAvatar user={{ ...user, avatarUrl: form.avatarUrl }} sizeClass="h-24 w-24" textClass="text-2xl" />
             <div>
-              <p className="font-semibold text-slate-900">{form.username || user?.username || "User"}</p>
-              <p className="text-sm text-slate-600">{form.email || user?.email}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{form.username || user?.username || "User"}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">{form.email || user?.email}</p>
             </div>
           </div>
 
           <div className="mt-6 space-y-3 text-sm">
             <div>
-              <p className="text-slate-500">User ID</p>
-              <p className="font-medium text-slate-900 break-all">{user?.id || "N/A"}</p>
+              <p className="text-slate-500 dark:text-slate-400">User ID</p>
+              <p className="font-medium text-slate-900 break-all dark:text-slate-100">{user?.id || "N/A"}</p>
             </div>
             <div>
-              <p className="text-slate-500">Member Since</p>
-              <p className="font-medium text-slate-900">{joinedOn}</p>
+              <p className="text-slate-500 dark:text-slate-400">Member Since</p>
+              <p className="font-medium text-slate-900 dark:text-slate-100">{joinedOn}</p>
             </div>
           </div>
         </section>
 
         <section className="surface fade-up p-5">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Account Details</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Account Details</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="label" htmlFor="profile-username">
@@ -164,8 +164,8 @@ export default function ProfilePage() {
               <p className="field-hint">Use a public http/https image URL.</p>
             </div>
 
-            {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
-            {success && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>}
+            {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-500/40 dark:bg-rose-950/45 dark:text-rose-200">{error}</p>}
+            {success && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-950/45 dark:text-emerald-200">{success}</p>}
 
             <div className="flex flex-wrap gap-2">
               <button className="btn" type="submit" disabled={isSaveDisabled}>

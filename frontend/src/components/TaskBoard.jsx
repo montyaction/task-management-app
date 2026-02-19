@@ -10,21 +10,21 @@ const COLUMNS = [
     title: "To Do",
     hint: "Planned tasks waiting to start.",
     dotClass: "bg-sky-500",
-    activeDropClass: "border-sky-300 bg-sky-50/70"
+    activeDropClass: "border-sky-300 bg-sky-50/70 dark:border-sky-500/50 dark:bg-sky-500/15"
   },
   {
     key: "in-progress",
     title: "In Progress",
     hint: "Tasks currently being worked on.",
     dotClass: "bg-amber-500",
-    activeDropClass: "border-amber-300 bg-amber-50/70"
+    activeDropClass: "border-amber-300 bg-amber-50/70 dark:border-amber-500/50 dark:bg-amber-500/15"
   },
   {
     key: "completed",
     title: "Completed",
     hint: "Finished work ready for review.",
     dotClass: "bg-emerald-500",
-    activeDropClass: "border-emerald-300 bg-emerald-50/70"
+    activeDropClass: "border-emerald-300 bg-emerald-50/70 dark:border-emerald-500/50 dark:bg-emerald-500/15"
   }
 ];
 
@@ -140,8 +140,8 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className={`h-2.5 w-2.5 rounded-full ${column.dotClass}`} />
-          <h3 className="text-base font-semibold text-slate-900">{column.title}</h3>
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{column.title}</h3>
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
             {items.length}
           </span>
         </div>
@@ -153,12 +153,12 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
         )}
       </div>
 
-      <p className="mb-3 text-xs text-slate-500">{column.hint}</p>
+      <p className="mb-3 text-xs text-slate-500 dark:text-slate-400">{column.hint}</p>
 
       <div
         ref={setNodeRef}
         className={`min-h-[170px] space-y-2 rounded-2xl border border-dashed p-2.5 transition-colors duration-150 ${
-          isOver ? column.activeDropClass : "border-slate-200 bg-slate-50/60"
+          isOver ? column.activeDropClass : "border-slate-200 bg-slate-50/60 dark:border-slate-700 dark:bg-slate-900/40"
         }`}
       >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
@@ -175,7 +175,7 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
         </SortableContext>
 
         {items.length === 0 && (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white/80 px-3 py-6 text-center text-sm text-slate-500">
+          <div className="rounded-xl border border-dashed border-slate-200 bg-white/80 px-3 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400">
             Drop tasks here
           </div>
         )}

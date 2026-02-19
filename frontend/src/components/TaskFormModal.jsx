@@ -48,10 +48,10 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
     >
       <div className="surface w-full max-w-xl p-5 sm:p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-slate-900">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
             {initial ? "Edit Task" : "New Task"}
           </h3>
-          <button className="btn-ghost px-1.5 py-0.5 text-base leading-none text-slate-500" onClick={onClose} aria-label="Close">
+          <button className="btn-ghost px-1.5 py-0.5 text-base leading-none text-slate-500 dark:text-slate-300" onClick={onClose} aria-label="Close">
             x
           </button>
         </div>
