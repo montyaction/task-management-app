@@ -27,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="flex items-center justify-center py-10 md:py-14">
       <div className="card w-full max-w-md">
         <h1 className="text-2xl font-semibold mb-6 text-center">Sign in</h1>
         <form onSubmit={onSubmit} className="space-y-4">

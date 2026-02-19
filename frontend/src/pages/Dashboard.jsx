@@ -10,7 +10,7 @@ const sortByPosition = (list) => [...list].sort((a, b) => (a.position ?? 0) - (b
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { token, user, logout } = useAuthStore();
+  const { token, user } = useAuthStore();
   const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask, applyTaskReorder, reorderTasksPersist } = useTaskStore();
   const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
 
@@ -105,21 +105,16 @@ export default function Dashboard() {
     }
   }, [applyTaskReorder, fetchTasks, reorderTasksPersist, tasks]);
 
-  const handleLogout = useCallback(() => {
-    logout();
-  }, [logout]);
-
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto">
-      <header className="flex items-center justify-between mb-6">
+    <div className="w-full">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Task Board</h1>
-          <p className="text-sm text-gray-600">Welcome, {user?.username}</p>
+          <h1 className="text-2xl font-semibold">Team Dashboard</h1>
+          <p className="text-sm text-gray-600">
+            Welcome back, {user?.username || user?.email}. Review priorities and keep the workflow moving.
+          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="btn-outline" onClick={fetchTasks}>Refresh</button>
-          <button className="btn" onClick={handleLogout}>Logout</button>
-        </div>
+        <button className="btn-outline" onClick={fetchTasks}>Refresh</button>
       </header>
 
       {error && <p className="text-red-600 mb-3">{error}</p>}
