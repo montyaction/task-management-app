@@ -5,9 +5,27 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 
 const COLUMNS = [
-  { key: "to-do", title: "To Do" },
-  { key: "in-progress", title: "In Progress" },
-  { key: "completed", title: "Completed" }
+  {
+    key: "to-do",
+    title: "To Do",
+    hint: "Planned tasks waiting to start.",
+    dotClass: "bg-sky-500",
+    activeDropClass: "border-sky-300 bg-sky-50/70"
+  },
+  {
+    key: "in-progress",
+    title: "In Progress",
+    hint: "Tasks currently being worked on.",
+    dotClass: "bg-amber-500",
+    activeDropClass: "border-amber-300 bg-amber-50/70"
+  },
+  {
+    key: "completed",
+    title: "Completed",
+    hint: "Finished work ready for review.",
+    dotClass: "bg-emerald-500",
+    activeDropClass: "border-emerald-300 bg-emerald-50/70"
+  }
 ];
 
 function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
@@ -81,7 +99,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
 
   return (
     <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={handleDragEnd}>
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid gap-4 xl:grid-cols-3">
         {COLUMNS.map((col) => (
           <Column
             key={col.key}
@@ -102,26 +120,44 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete }) {
   const itemIds = useMemo(() => items.map((task) => String(task._id)), [items]);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-semibold">{column.title}</h3>
+    <section className="surface fade-up p-3 sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className={`h-2.5 w-2.5 rounded-full ${column.dotClass}`} />
+          <h3 className="text-base font-semibold text-slate-900">{column.title}</h3>
+          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+            {items.length}
+          </span>
+        </div>
+
         {column.key === "to-do" && (
-          <button className="btn text-sm" onClick={onCreateClick}>+ New</button>
+          <button className="btn-outline px-3 py-1.5 text-xs sm:text-sm" onClick={onCreateClick}>
+            + New
+          </button>
         )}
       </div>
 
+      <p className="mb-3 text-xs text-slate-500">{column.hint}</p>
+
       <div
         ref={setNodeRef}
-        className={`space-y-2 min-h-[60px] p-2 rounded transition-colors duration-150 ${isOver ? "bg-blue-50" : "bg-gray-50"}`}
-        style={{ minHeight: 60, border: "1px dashed #cbd5e1" }}
+        className={`min-h-[170px] space-y-2 rounded-2xl border border-dashed p-2.5 transition-colors duration-150 ${
+          isOver ? column.activeDropClass : "border-slate-200 bg-slate-50/60"
+        }`}
       >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {items.map((task) => (
             <SortableTask key={task._id} task={task} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </SortableContext>
+
+        {items.length === 0 && (
+          <div className="rounded-xl border border-dashed border-slate-200 bg-white/80 px-3 py-6 text-center text-sm text-slate-500">
+            Drop tasks here
+          </div>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -136,17 +172,19 @@ function SortableTaskComponent({ task, onEdit, onDelete }) {
     () => ({
       transform: CSS.Transform.toString(transform),
       transition,
-      userSelect: "none",
-      background: isDragging ? "#e0e7ff" : "white",
-      borderRadius: 8,
-      boxShadow: isDragging ? "0 2px 8px #a5b4fc" : "none",
-      marginBottom: 8
+      touchAction: "none"
     }),
-    [isDragging, transform, transition]
+    [transform, transition]
   );
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`transition ${isDragging ? "scale-[1.01] opacity-90" : "opacity-100"}`}
+    >
       <TaskCard task={task} onEdit={onEdit} onDelete={onDelete} />
     </div>
   );

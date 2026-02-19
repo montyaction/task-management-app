@@ -1,14 +1,24 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
+
+const highlights = [
+  "Track what needs attention now.",
+  "Drag tasks smoothly across the board.",
+  "Keep priorities visible for the entire team."
+];
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, token } = useAuthStore();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +27,6 @@ export default function LoginPage() {
     const credentials = { identifier, password };
 
     const result = await login(credentials);
-    console.log(result);
-
     if (result.success) {
       navigate("/dashboard");
     } else {
@@ -27,40 +35,75 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center py-10 md:py-14">
-      <div className="card w-full max-w-md">
-        <h1 className="text-2xl font-semibold mb-6 text-center">Sign in</h1>
-        <form onSubmit={onSubmit} className="space-y-4">
+    <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="surface fade-up hidden p-7 lg:flex lg:flex-col lg:justify-between xl:p-10">
+        <div>
+          <p className="badge border-sky-200 bg-sky-50 text-sky-700">Welcome Back</p>
+          <h1 className="mt-5 max-w-lg text-4xl font-bold text-slate-900">Keep your team focused with one clear workflow.</h1>
+          <p className="mt-4 max-w-xl text-base text-slate-600">
+            Sign in to review pending work, rebalance priorities, and ship progress with confidence.
+          </p>
+        </div>
+
+        <ul className="mt-8 space-y-3">
+          {highlights.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="surface fade-up mx-auto w-full max-w-md p-6 sm:p-8">
+        <h1 className="text-3xl font-bold text-slate-900">Sign in</h1>
+        <p className="mt-1 text-sm text-slate-600">Use your email or username to continue.</p>
+
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="label">Email or Username</label>
+            <label className="label" htmlFor="identifier">
+              Email or Username
+            </label>
             <input
+              id="identifier"
               className="input"
               placeholder="you@example.com or yourname"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              autoComplete="username"
               required
             />
           </div>
+
           <div>
-            <label className="label">Password</label>
+            <label className="label" htmlFor="password">
+              Password
+            </label>
             <input
+              id="password"
               className="input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               required
             />
           </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+
+          {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
+
           <button className="btn w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Sign in"}
           </button>
         </form>
-        <p className="text-sm text-center mt-4">
+
+        <p className="mt-5 text-center text-sm text-slate-600">
           No account?{" "}
-          <Link to="/register" className="text-emerald-600 underline">Create one</Link>
+          <Link to="/register" className="font-semibold text-sky-700 hover:text-sky-800">
+            Create one
+          </Link>
         </p>
-      </div>
+      </section>
     </div>
   );
 }

@@ -2,31 +2,27 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 bg-white">
-      <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-6 text-sm text-slate-600 md:grid-cols-3 md:px-8">
-        <div>
-          <h2 className="mb-2 font-semibold text-slate-900">About This App</h2>
-          <p>
-            This task manager gives teams one place to plan work, move tasks across a Kanban workflow, and stay aligned
-            on delivery.
-          </p>
-        </div>
+    <footer className="border-t border-white/80 bg-white/65 backdrop-blur">
+      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 text-sm text-slate-600 md:grid-cols-3 md:px-8">
+        <section>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-900">Plan Clearly</h2>
+          <p>Capture tasks quickly, prioritize by urgency, and keep project momentum visible for your whole team.</p>
+        </section>
 
-        <div>
-          <h2 className="mb-2 font-semibold text-slate-900">What You Can Do</h2>
-          <p>Register securely, create and edit tasks, drag items between columns, and keep priorities visible.</p>
-        </div>
+        <section>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-900">Move Faster</h2>
+          <p>Drag work between columns to reflect reality in real time and keep everyone aligned on next actions.</p>
+        </section>
 
-        <div>
-          <h2 className="mb-2 font-semibold text-slate-900">Tech Stack</h2>
-          <p>Built with React, Vite, Tailwind CSS, Node.js, Express, MongoDB, and Zustand state management.</p>
-        </div>
+        <section>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-900">Built For Teams</h2>
+          <p>Powered by React, Tailwind CSS, Express, MongoDB, and Zustand with secure authentication and profile tools.</p>
+        </section>
       </div>
 
-      <div className="border-t border-slate-200 px-4 py-3 text-center text-xs text-slate-500 md:px-8">
-        &copy; {year} Task Management Application. All rights reserved.
+      <div className="border-t border-white/80 px-4 py-3 text-center text-xs text-slate-500 md:px-8">
+        &copy; {year} Task Management Application
       </div>
     </footer>
   );
 }
-

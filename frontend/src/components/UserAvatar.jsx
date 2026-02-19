@@ -24,7 +24,7 @@ export default function UserAvatar({ user, className = "", sizeClass = "h-10 w-1
 
   return (
     <div
-      className={`inline-flex items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-700 font-semibold ${sizeClass} ${textClass} ${className}`}
+      className={`inline-flex items-center justify-center overflow-hidden rounded-full border border-white/80 bg-gradient-to-br from-slate-100 to-slate-200 font-semibold text-slate-700 shadow-sm ${sizeClass} ${textClass} ${className}`}
       aria-label="User avatar"
     >
       {showImage ? (

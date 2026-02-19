@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
+
+const highlights = [
+  "Create structured task boards in minutes.",
+  "Prioritize high-impact work with confidence.",
+  "Keep your project delivery status always visible."
+];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -12,8 +18,7 @@ export default function RegisterPage() {
   const { register, isLoading, token } = useAuthStore();
 
   if (token) {
-    navigate("/dashboard");
-    return null;  // Component ko render hone se rokein
+    return <Navigate to="/dashboard" replace />;
   }
 
   const onSubmit = async (e) => {
@@ -32,50 +37,91 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center py-10 md:py-14">
-      <div className="card w-full max-w-md">
-        <h1 className="text-2xl font-semibold mb-6 text-center">Create account</h1>
-        <form onSubmit={onSubmit} className="space-y-4">
+    <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="surface fade-up mx-auto w-full max-w-md p-6 sm:p-8">
+        <h1 className="text-3xl font-bold text-slate-900">Create account</h1>
+        <p className="mt-1 text-sm text-slate-600">Start organizing work in a focused, collaborative flow.</p>
+
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="label">Username</label>
+            <label className="label" htmlFor="username">
+              Username
+            </label>
             <input
+              id="username"
               className="input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
               required
             />
           </div>
+
           <div>
-            <label className="label">Email</label>
+            <label className="label" htmlFor="email">
+              Email
+            </label>
             <input
+              id="email"
               className="input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
+
           <div>
-            <label className="label">Password</label>
+            <label className="label" htmlFor="password">
+              Password
+            </label>
             <input
+              id="password"
               className="input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
               required
               minLength={6}
             />
+            <p className="field-hint">Use at least 6 characters.</p>
           </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+
+          {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
+
           <button className="btn w-full" disabled={isLoading}>
             {isLoading ? "Creating..." : "Create account"}
           </button>
         </form>
-        <p className="text-sm text-center mt-4">
+
+        <p className="mt-5 text-center text-sm text-slate-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-emerald-600 underline">Sign in</Link>
+          <Link to="/login" className="font-semibold text-sky-700 hover:text-sky-800">
+            Sign in
+          </Link>
         </p>
-      </div>
+      </section>
+
+      <section className="surface fade-up hidden p-7 lg:flex lg:flex-col lg:justify-between xl:p-10">
+        <div>
+          <p className="badge border-emerald-200 bg-emerald-50 text-emerald-700">Get Started</p>
+          <h2 className="mt-5 max-w-lg text-4xl font-bold text-slate-900">Build a calmer workflow for your projects.</h2>
+          <p className="mt-4 max-w-xl text-base text-slate-600">
+            Set up your account and bring planning, execution, and delivery into one streamlined dashboard.
+          </p>
+        </div>
+
+        <ul className="mt-8 space-y-3">
+          {highlights.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
+              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-sky-500" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

@@ -50,7 +50,15 @@ export default function ProfilePage() {
   }, [user]);
 
   const joinedOn = useMemo(() => formatJoinedDate(user?.createdAt), [user?.createdAt]);
-  const isSaveDisabled = isLoading || !form.username.trim() || !form.email.trim();
+  const hasChanges = useMemo(
+    () =>
+      form.username.trim() !== (user?.username || "") ||
+      form.email.trim() !== (user?.email || "") ||
+      form.avatarUrl.trim() !== (user?.avatarUrl || ""),
+    [form.avatarUrl, form.email, form.username, user?.avatarUrl, user?.email, user?.username]
+  );
+
+  const isSaveDisabled = isLoading || !form.username.trim() || !form.email.trim() || !hasChanges;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -77,19 +85,20 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-slate-900">Your Profile</h1>
-        <p className="text-sm text-slate-600">Manage your account details and avatar used across the app.</p>
+    <div className="space-y-5">
+      <header className="surface fade-up p-5 sm:p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">Account</p>
+        <h1 className="mt-1 text-3xl font-bold text-slate-900">Your Profile</h1>
+        <p className="mt-1 text-sm text-slate-600">Manage your account details and avatar used across the app.</p>
       </header>
 
-      <div className="grid gap-6 md:grid-cols-[280px_1fr]">
-        <section className="card">
+      <div className="grid gap-5 lg:grid-cols-[290px_1fr]">
+        <section className="surface fade-up p-5">
           <div className="flex flex-col items-center gap-3 text-center">
             <UserAvatar user={{ ...user, avatarUrl: form.avatarUrl }} sizeClass="h-24 w-24" textClass="text-2xl" />
             <div>
-              <p className="font-semibold text-slate-900">{user?.username || "User"}</p>
-              <p className="text-sm text-slate-600">{user?.email}</p>
+              <p className="font-semibold text-slate-900">{form.username || user?.username || "User"}</p>
+              <p className="text-sm text-slate-600">{form.email || user?.email}</p>
             </div>
           </div>
 
@@ -105,12 +114,15 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="card">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">Account Details</h2>
+        <section className="surface fade-up p-5">
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Account Details</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="label">Username</label>
+              <label className="label" htmlFor="profile-username">
+                Username
+              </label>
               <input
+                id="profile-username"
                 className="input"
                 name="username"
                 value={form.username}
@@ -121,8 +133,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="label">Email</label>
+              <label className="label" htmlFor="profile-email">
+                Email
+              </label>
               <input
+                id="profile-email"
                 className="input"
                 type="email"
                 name="email"
@@ -134,8 +149,11 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="label">Avatar URL</label>
+              <label className="label" htmlFor="profile-avatar-url">
+                Avatar URL
+              </label>
               <input
+                id="profile-avatar-url"
                 className="input"
                 type="url"
                 name="avatarUrl"
@@ -143,11 +161,11 @@ export default function ProfilePage() {
                 onChange={handleChange}
                 placeholder="https://example.com/avatar.jpg"
               />
-              <p className="mt-1 text-xs text-slate-500">Use a public http/https image URL.</p>
+              <p className="field-hint">Use a public http/https image URL.</p>
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            {success && <p className="text-sm text-emerald-700">{success}</p>}
+            {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
+            {success && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p>}
 
             <div className="flex flex-wrap gap-2">
               <button className="btn" type="submit" disabled={isSaveDisabled}>
@@ -157,7 +175,7 @@ export default function ProfilePage() {
                 className="btn-outline"
                 type="button"
                 onClick={() => setForm(getInitialForm(user))}
-                disabled={isLoading}
+                disabled={isLoading || !hasChanges}
               >
                 Reset
               </button>
