@@ -131,7 +131,7 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete }) {
         </div>
 
         {column.key === "to-do" && (
-          <button className="btn-outline px-3 py-1.5 text-xs sm:text-sm" onClick={onCreateClick}>
+          <button className="btn-outline px-2.5 py-1 text-xs" onClick={onCreateClick}>
             + New
           </button>
         )}

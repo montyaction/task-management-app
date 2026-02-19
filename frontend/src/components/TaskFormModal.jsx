@@ -51,7 +51,7 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
           <h3 className="text-xl font-semibold text-slate-900">
             {initial ? "Edit Task" : "New Task"}
           </h3>
-          <button className="btn-ghost px-2 py-1 text-lg leading-none text-slate-500" onClick={onClose} aria-label="Close">
+          <button className="btn-ghost px-1.5 py-0.5 text-base leading-none text-slate-500" onClick={onClose} aria-label="Close">
             x
           </button>
         </div>
