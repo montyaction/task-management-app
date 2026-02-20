@@ -1,7 +1,24 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import TaskCard from "./TaskCard.jsx";
-import { DndContext, PointerSensor, closestCorners, pointerWithin, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCorners,
+  pointerWithin,
+  useDroppable,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  defaultAnimateLayoutChanges,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const COLUMNS = [
@@ -10,34 +27,50 @@ const COLUMNS = [
     title: "To Do",
     hint: "Planned tasks waiting to start.",
     dotClass: "bg-sky-500",
-    activeDropClass: "border-sky-300 bg-sky-50/70 dark:border-sky-500/50 dark:bg-sky-500/15"
+    activeDropClass: "border-sky-300 bg-sky-50/75 ring-2 ring-sky-200/70 dark:border-sky-500/60 dark:bg-sky-500/15 dark:ring-sky-500/25"
   },
   {
     key: "in-progress",
     title: "In Progress",
     hint: "Tasks currently being worked on.",
     dotClass: "bg-amber-500",
-    activeDropClass: "border-amber-300 bg-amber-50/70 dark:border-amber-500/50 dark:bg-amber-500/15"
+    activeDropClass: "border-amber-300 bg-amber-50/75 ring-2 ring-amber-200/70 dark:border-amber-500/60 dark:bg-amber-500/15 dark:ring-amber-500/25"
   },
   {
     key: "completed",
     title: "Completed",
     hint: "Finished work ready for review.",
     dotClass: "bg-emerald-500",
-    activeDropClass: "border-emerald-300 bg-emerald-50/70 dark:border-emerald-500/50 dark:bg-emerald-500/15"
+    activeDropClass: "border-emerald-300 bg-emerald-50/75 ring-2 ring-emerald-200/70 dark:border-emerald-500/60 dark:bg-emerald-500/15 dark:ring-emerald-500/25"
   }
 ];
 
+const DROP_ANIMATION = {
+  duration: 220,
+  easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
+};
+
 function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [activeTaskId, setActiveTaskId] = useState(null);
   const orderedTasks = useMemo(
     () => [...tasks].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
     [tasks]
   );
+  const taskById = useMemo(
+    () => new Map(orderedTasks.map((task) => [String(task._id), task])),
+    [orderedTasks]
+  );
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 6 }
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 8 }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 220, tolerance: 8 }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
     })
   );
 
@@ -57,24 +90,40 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
 
   useEffect(() => {
     if (!selectedTaskId) return;
-    const stillExists = orderedTasks.some((task) => String(task._id) === selectedTaskId);
+    const stillExists = taskById.has(selectedTaskId);
     if (!stillExists) {
       setSelectedTaskId(null);
     }
-  }, [orderedTasks, selectedTaskId]);
+  }, [selectedTaskId, taskById]);
+
+  useEffect(() => {
+    if (!activeTaskId) return;
+    if (!taskById.has(activeTaskId)) {
+      setActiveTaskId(null);
+    }
+  }, [activeTaskId, taskById]);
 
   const handleSelectTask = useCallback((taskId) => {
     const nextId = String(taskId);
     setSelectedTaskId((prev) => (prev === nextId ? null : nextId));
   }, []);
 
+  const handleDragStart = useCallback(({ active }) => {
+    setActiveTaskId(String(active.id));
+  }, []);
+
+  const handleDragCancel = useCallback(() => {
+    setActiveTaskId(null);
+  }, []);
+
   const handleDragEnd = useCallback(
     ({ active, over }) => {
+      setActiveTaskId(null);
       if (!over) return;
 
       const activeId = String(active.id);
       const overId = String(over.id);
-      const activeTask = orderedTasks.find((t) => String(t._id) === activeId);
+      const activeTask = taskById.get(activeId);
       if (!activeTask) return;
 
       const sourceStatus = activeTask.status;
@@ -90,7 +139,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
         destinationStatus = overId;
         destinationIndex = (byStatus[destinationStatus] || []).length;
       } else {
-        const overTask = orderedTasks.find((t) => String(t._id) === overId);
+        const overTask = taskById.get(overId);
         if (!overTask) return;
         destinationStatus = overTask.status;
         const destinationTasks = byStatus[destinationStatus] || [];
@@ -108,11 +157,75 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
         destinationIndex
       });
     },
-    [byStatus, onDragEnd, orderedTasks]
+    [byStatus, onDragEnd, taskById]
   );
 
+  const getColumnTitle = useCallback(
+    (statusKey) => COLUMNS.find((column) => column.key === statusKey)?.title ?? "Unknown",
+    []
+  );
+
+  const getDropStatusFromOverId = useCallback(
+    (overId) => {
+      if (!overId) return null;
+      const normalizedId = String(overId);
+      const isColumn = COLUMNS.some((column) => column.key === normalizedId);
+      if (isColumn) return normalizedId;
+      return taskById.get(normalizedId)?.status ?? null;
+    },
+    [taskById]
+  );
+
+  const announcements = useMemo(
+    () => ({
+      onDragStart({ active }) {
+        const task = taskById.get(String(active.id));
+        return task ? `Picked up ${task.title}.` : "Picked up task.";
+      },
+      onDragOver({ active, over }) {
+        const task = taskById.get(String(active.id));
+        const status = getDropStatusFromOverId(over?.id);
+
+        if (!task) return undefined;
+        if (!status) return `${task.title} is not over a drop zone.`;
+
+        return `${task.title} is over ${getColumnTitle(status)}.`;
+      },
+      onDragEnd({ active, over }) {
+        const task = taskById.get(String(active.id));
+        const status = getDropStatusFromOverId(over?.id);
+
+        if (!task) return undefined;
+        if (!status) return `${task.title} was dropped.`;
+
+        return `${task.title} moved to ${getColumnTitle(status)}.`;
+      },
+      onDragCancel({ active }) {
+        const task = taskById.get(String(active.id));
+        return task ? `Drag cancelled. ${task.title} returned to its original position.` : "Drag cancelled.";
+      }
+    }),
+    [getColumnTitle, getDropStatusFromOverId, taskById]
+  );
+
+  const activeTask = activeTaskId ? taskById.get(activeTaskId) ?? null : null;
+
   return (
-    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={collisionDetection}
+      autoScroll
+      onDragStart={handleDragStart}
+      onDragCancel={handleDragCancel}
+      onDragEnd={handleDragEnd}
+      accessibility={{
+        screenReaderInstructions: {
+          draggable:
+            "Press space to pick up a task. While dragging, use arrow keys to move it between tasks and columns. Press space to drop, or Escape to cancel."
+        },
+        announcements
+      }}
+    >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {COLUMNS.map((col) => (
           <Column
@@ -124,14 +237,23 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
             onDelete={onDelete}
             selectedTaskId={selectedTaskId}
             onSelectTask={handleSelectTask}
+            activeTaskId={activeTaskId}
           />
         ))}
       </div>
+
+      <DragOverlay dropAnimation={DROP_ANIMATION} zIndex={1200}>
+        {activeTask ? (
+          <div className="pointer-events-none w-[min(100vw-2rem,420px)] cursor-grabbing">
+            <TaskCard task={activeTask} dragging asOverlay />
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }
 
-function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask }) {
+function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask, activeTaskId }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.key });
   const itemIds = useMemo(() => items.map((task) => String(task._id)), [items]);
 
@@ -157,8 +279,10 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
 
       <div
         ref={setNodeRef}
-        className={`min-h-[170px] space-y-2 rounded-2xl border border-dashed p-2.5 transition-colors duration-150 ${
-          isOver ? column.activeDropClass : "border-slate-200 bg-slate-50/60 dark:border-slate-700 dark:bg-slate-900/40"
+        className={`min-h-[170px] space-y-2 rounded-2xl border border-dashed p-2.5 transition-all duration-200 ${
+          isOver
+            ? column.activeDropClass
+            : "border-slate-200 bg-slate-50/60 dark:border-slate-700 dark:bg-slate-900/40"
         }`}
       >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
@@ -175,8 +299,14 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
         </SortableContext>
 
         {items.length === 0 && (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white/80 px-3 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400">
-            Drop tasks here
+          <div
+            className={`rounded-xl border border-dashed px-3 py-6 text-center text-sm transition-colors duration-150 ${
+              isOver
+                ? "border-sky-300 bg-sky-50/70 text-sky-700 dark:border-sky-500/60 dark:bg-sky-500/15 dark:text-sky-200"
+                : "border-slate-200 bg-white/80 text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400"
+            }`}
+          >
+            {isOver ? "Release to drop" : activeTaskId ? "Drop here" : "Drop tasks here"}
           </div>
         )}
       </div>
@@ -188,17 +318,23 @@ const Column = memo(ColumnComponent);
 
 function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: String(task._id)
+    id: String(task._id),
+    animateLayoutChanges: defaultAnimateLayoutChanges,
+    transition: {
+      duration: 220,
+      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
+    }
   });
   const isSelected = selectedTaskId === String(task._id);
 
   const style = useMemo(
     () => ({
       transform: CSS.Transform.toString(transform),
-      transition,
-      touchAction: "none"
+      transition: transition ?? "transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+      touchAction: "none",
+      willChange: isDragging ? "transform" : undefined
     }),
-    [transform, transition]
+    [isDragging, transform, transition]
   );
 
   return (
@@ -207,7 +343,7 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
       style={style}
       {...attributes}
       {...listeners}
-      className={`transition ${isDragging ? "scale-[1.01] opacity-90" : "opacity-100"}`}
+      className={`transition-[opacity,filter] duration-150 ${isDragging ? "cursor-grabbing opacity-45" : "opacity-100"}`}
     >
       <TaskCard
         task={task}
@@ -215,6 +351,9 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
         onDelete={onDelete}
         selected={isSelected}
         onSelect={() => onSelectTask(task._id)}
+        showDragHandle
+        dragging={isDragging}
+        isGhost={isDragging}
       />
     </div>
   );

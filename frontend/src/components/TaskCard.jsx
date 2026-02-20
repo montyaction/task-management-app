@@ -22,9 +22,22 @@ const formatUpdatedAt = (value) => {
   return `Updated ${date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 };
 
-function TaskCard({ task, onEdit, onDelete, selected = false, onSelect }) {
+function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  selected = false,
+  onSelect,
+  showDragHandle = false,
+  dragging = false,
+  asOverlay = false,
+  isGhost = false
+}) {
   const priority = PRIORITY_MAP[task.priority] || PRIORITY_MAP.medium;
+  const isInteractive = !asOverlay && typeof onSelect === "function";
+
   const handleCardKeyDown = (event) => {
+    if (!isInteractive) return;
     if (event.target !== event.currentTarget) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -34,16 +47,22 @@ function TaskCard({ task, onEdit, onDelete, selected = false, onSelect }) {
 
   return (
     <article
-      className={`mb-2 rounded-2xl border bg-white px-4 py-3.5 shadow-sm transition hover:-translate-y-px hover:shadow-md dark:bg-slate-900 ${
+      className={`mb-2 rounded-2xl border bg-white px-4 py-3.5 shadow-sm transition dark:bg-slate-900 ${
+        isInteractive && !dragging && !isGhost ? "cursor-pointer hover:-translate-y-px hover:shadow-md" : ""
+      } ${
         selected
           ? "border-sky-300 ring-2 ring-sky-100 dark:border-sky-500 dark:ring-sky-500/25"
           : "border-slate-200/90 dark:border-slate-700"
+      } ${dragging && asOverlay ? "scale-[1.01] shadow-2xl" : ""} ${
+        isGhost
+          ? "border-dashed border-slate-300 bg-slate-100/75 shadow-none dark:border-slate-600 dark:bg-slate-800/45"
+          : ""
       }`}
-      onClick={onSelect}
-      onKeyDown={handleCardKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-pressed={selected}
+      onClick={isInteractive ? onSelect : undefined}
+      onKeyDown={isInteractive ? handleCardKeyDown : undefined}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      aria-pressed={isInteractive ? selected : undefined}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -54,21 +73,36 @@ function TaskCard({ task, onEdit, onDelete, selected = false, onSelect }) {
             <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">No description added.</p>
           )}
         </div>
-        <span className={`shrink-0 rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${priority.className}`}>
-          {priority.label}
-        </span>
+        <div className="flex shrink-0 items-start gap-2">
+          <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${priority.className}`}>
+            {priority.label}
+          </span>
+
+          {showDragHandle && (
+            <span
+              aria-hidden="true"
+              className={`inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs leading-none tracking-tight text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 ${
+                dragging ? "cursor-grabbing" : "cursor-grab"
+              }`}
+            >
+              {"\u22EE\u22EE"}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs text-slate-500 dark:text-slate-400">{formatUpdatedAt(task.updatedAt)}</p>
-        {selected ? (
+        {asOverlay ? (
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-300">Dragging</p>
+        ) : selected ? (
           <div className="flex gap-2">
             <button
               type="button"
               className="btn-outline px-2.5 py-1 text-[11px]"
               onClick={(event) => {
                 event.stopPropagation();
-                onEdit(task);
+                onEdit?.(task);
               }}
             >
               Edit
@@ -78,7 +112,7 @@ function TaskCard({ task, onEdit, onDelete, selected = false, onSelect }) {
               className="btn-danger"
               onClick={(event) => {
                 event.stopPropagation();
-                onDelete(task._id);
+                onDelete?.(task._id);
               }}
             >
               Delete
