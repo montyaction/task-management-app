@@ -7,7 +7,7 @@ export const notFound = (req, res, next) => {
 export const errorHandler = (err, req, res, next) => {
   console.error(err.stack || err);
 
-  const status = err.status || 500;
+  const status = err.status || (err.message === "CORS origin not allowed" ? 403 : 500);
   const message = err.message || "Internal Server Error";
 
   res.status(status).json({ message });

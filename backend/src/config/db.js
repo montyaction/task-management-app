@@ -5,13 +5,15 @@ export const connectDB = async () => {
   if (!uri) {
     throw new Error("MONGO_URI is not set");
   }
+
+  const isProduction = process.env.NODE_ENV === "production";
+
   try {
     await mongoose.connect(uri, {
-      autoIndex: true
+      autoIndex: !isProduction
     });
     console.log("MongoDB connected");
   } catch (err) {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
+    throw new Error(`MongoDB connection error: ${err.message}`);
   }
 };
