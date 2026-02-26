@@ -1,0 +1,12 @@
+name: task-management-app
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    ports:
+      - "${PORT:-5000}:${PORT:-5000}"
+    restart: unless-stopped
