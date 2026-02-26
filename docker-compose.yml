@@ -9,4 +9,8 @@ services:
       - ./backend/.env
     ports:
       - "${PORT:-5000}:${PORT:-5000}"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npx nodemon src/server.js
     restart: unless-stopped
