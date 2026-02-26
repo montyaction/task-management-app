@@ -4,12 +4,17 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import mongoose from "mongoose";
+import path from "path";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.routes.js";
 import taskRoutes from "./routes/task.routes.js";
 import boardRoutes from "./routes/board.routes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, "public");
 
 const getAllowedOrigins = () =>
   (process.env.CLIENT_URL || "")
@@ -48,7 +53,12 @@ app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use(express.static(publicDir));
 app.use("/api", apiRateLimiter);
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
 
 app.get("/api/health", (req, res) => {
   const dbState = mongoose.connection.readyState;

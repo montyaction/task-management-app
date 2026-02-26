@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Board Backend</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111a2e;
+      --text: #e9eefc;
+      --muted: #a6b1d1;
+      --accent: #4fd1c5;
+      --border: #233252;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1a2a4a, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    h2 {
+      margin-top: 26px;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+    li { margin-bottom: 8px; }
+    code {
+      color: var(--accent);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95rem;
+    }
+    .footer {
+      margin-top: 24px;
+      font-size: 0.92rem;
+      color: #8f9ac0;
+    }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 12px;
+      margin-bottom: 14px;
+      color: var(--accent);
+      font-size: 0.85rem;
+      letter-spacing: 0.4px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <span class="pill">Task Board API</span>
+      <h1>Welcome to the Backend Service</h1>
+      <p>
+        This backend powers the Task Management Application. It provides authentication,
+        task operations, board management, and health monitoring for production deployments.
+      </p>
+
+      <h2>Core Features</h2>
+      <ul>
+        <li>User registration and login with JWT authentication</li>
+        <li>Task CRUD and task reordering support</li>
+        <li>Board CRUD endpoints for organizing tasks</li>
+        <li>Rate limiting, secure headers, and CORS controls</li>
+        <li>Database-aware health endpoint for uptime monitoring</li>
+      </ul>
+
+      <h2>Primary API Routes</h2>
+      <ul>
+        <li><code>GET /api/health</code> - service and database health</li>
+        <li><code>POST /api/auth/register</code> - create account</li>
+        <li><code>POST /api/auth/login</code> - authenticate user</li>
+        <li><code>/api/tasks</code> - task operations</li>
+        <li><code>/api/boards</code> - board operations</li>
+      </ul>
+
+      <p class="footer">
+        If you are seeing this page, the backend root route is configured successfully.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
