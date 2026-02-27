@@ -16,19 +16,42 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 
+const LOCALHOST_PATTERN = /^(localhost|127(?:\.\d{1,3}){3})(:\d+)?(\/.*)?$/i;
+
+const normalizeOrigin = (rawOrigin) => {
+  const value = rawOrigin.trim();
+  if (!value) return "";
+  if (value === "*") return value;
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    const protocol = LOCALHOST_PATTERN.test(value) ? "http://" : "https://";
+    try {
+      return new URL(`${protocol}${value}`).origin;
+    } catch {
+      return value.replace(/\/+$/, "");
+    }
+  }
+};
+
 const getAllowedOrigins = () =>
-  (process.env.CLIENT_URL || "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  [...new Set((process.env.CLIENT_URL || "").split(",").map(normalizeOrigin).filter(Boolean))];
 
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = getAllowedOrigins();
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes("*")) {
       callback(null, true);
       return;
     }
+
+    const normalizedOrigin = normalizeOrigin(origin);
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      callback(null, true);
+      return;
+    }
+
     callback(new Error("CORS origin not allowed"));
   },
   credentials: true
