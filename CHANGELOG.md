@@ -8,8 +8,8 @@ Historical versions below were reconstructed from commit milestones because rele
 
 ## [Unreleased]
 
-### Added
-- No unreleased changes yet.
+### Documentation
+- Consolidated release notes into a single file: `docs/releases/RELEASE_NOTES.md`.
 
 ## [1.2.1] - 2026-02-27
 

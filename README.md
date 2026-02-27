@@ -319,6 +319,7 @@ git push origin feature/<branch-name>
 
 - `ARCHITECTURE.md` for system-level architecture notes
 - `DRAG_AND_DROP_UX_REPORT.md` for DnD UI/UX implementation details
+- `docs/releases/RELEASE_NOTES.md` for consolidated release notes across all tagged versions
 
 ## License
 
