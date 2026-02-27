@@ -1,10 +1,10 @@
 // Handle non-existing routes
-export const notFound = (req, res, next) => {
+export const notFound = (req, res, _next) => {
   res.status(404).json({ message: "Route not found" });
 };
 
 // General error handler
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, req, res, _next) => {
   console.error(err.stack || err);
 
   const status = err.status || (err.message === "CORS origin not allowed" ? 403 : 500);
