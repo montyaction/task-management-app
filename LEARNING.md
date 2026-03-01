@@ -109,3 +109,23 @@
 - Treat date-only values as explicit domain data, not generic timestamps, and validate them early at API boundaries.
 - UI filters that show partial datasets can conflict with reorder semantics; disabling reorder in filtered mode is safer than implicit remapping.
 - Small visual indicators (badge + border tone + due-date text color) improve overdue discoverability without adding dashboard clutter.
+
+## Loading + Empty State UX Polish (2026-03-01)
+
+### Challenges Faced
+
+- The dashboard used basic loading placeholders that did not match production-level feedback expectations during task fetch cycles.
+- Empty boards had no dedicated first-use guidance, creating a weak onboarding moment for new users.
+- UX polish needed to stay consistent with existing Tailwind theme tokens and support both light and dark modes.
+
+### Architecture Decisions
+
+- Introduced a reusable `Skeleton` component as a shared UI primitive for shimmer placeholders.
+- Added a dedicated `TaskBoardSkeleton` layout to mirror the real board structure during loading, reducing visual layout shift.
+- Added `EmptyTaskState` with a clear CTA (`Create Your First Task`) and integrated it only when task count is zero and loading is complete.
+
+### Lessons Learned
+
+- Reusable loading primitives reduce duplication and keep future loading-state updates consistent across pages.
+- Empty-state design is part of product flow, not just fallback UI; a contextual CTA improves first-action conversion.
+- Theme-aware shimmer and reduced-motion support should be built into the base style utility, not bolted on per component.

@@ -59,6 +59,8 @@ The application helps users plan, track, and complete work across three core tas
 - Task status workflow (`to-do`, `in-progress`, `completed`)
 - Task due dates (`dueDate`) with overdue visual highlighting
 - Dashboard overdue-only filter for focused backlog triage
+- Reusable shimmer skeleton loading UI for task board fetch states
+- First-task empty state with guided CTA (`Create Your First Task`)
 - User profile management (username, email, avatar URL)
 - Automatic starter task seeding on new user registration
 - Theme switching (`light`, `dark`, `system`)
