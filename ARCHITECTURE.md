@@ -9,6 +9,7 @@ This is a full-stack task management application built with the **MERN stack** (
 - Kanban board with drag-and-drop (react-beautiful-dnd)
 - Task CRUD operations
 - Real-time task reordering with position persistence
+- Due date tracking with overdue highlighting and overdue-only dashboard filtering
 - Responsive design with Tailwind CSS
 - State management with Zustand
 
@@ -156,6 +157,7 @@ backend/
   description: String,
   status: String (enum: "to-do", "in-progress", "completed"),
   priority: String (enum: "low", "medium", "high"),
+  dueDate: Date | null,
   position: Number (ordering within status column),
   user_id: ObjectId (ref: User),
   createdAt: Date,
