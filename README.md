@@ -151,6 +151,25 @@ npm run preview  # Preview production build locally
   - run backend/frontend tests when scripts are present
   - build frontend
 
+## Automatic Versioning
+
+- GitHub Actions release workflow: `.github/workflows/release.yml`
+- Release config: `.releaserc.json`
+- Trigger: push to `develop`
+- Output:
+  - semantic version bump based on Conventional Commits
+  - tag creation (`vMAJOR.MINOR.PATCH`)
+  - GitHub release notes
+  - version alignment in `backend/package.json` and `frontend/package.json` (including lockfiles)
+  - changelog update in `CHANGELOG.md`
+
+### Conventional Commit -> Version Rules
+
+- `feat:` -> `MINOR`
+- `fix:`, `perf:`, `refactor:` -> `PATCH`
+- `BREAKING CHANGE` or `!` -> `MAJOR`
+- `docs:`, `chore:`, `ci:`, `test:`, `style:` -> no automatic release
+
 ## Project Structure Overview
 
 ```text
