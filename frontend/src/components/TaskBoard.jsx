@@ -50,7 +50,7 @@ const DROP_ANIMATION = {
   easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
 };
 
-function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
+function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd, dragDisabled = false }) {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [activeTaskId, setActiveTaskId] = useState(null);
   const orderedTasks = useMemo(
@@ -238,6 +238,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
             selectedTaskId={selectedTaskId}
             onSelectTask={handleSelectTask}
             activeTaskId={activeTaskId}
+            dragDisabled={dragDisabled}
           />
         ))}
       </div>
@@ -253,7 +254,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd }) {
   );
 }
 
-function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask, activeTaskId }) {
+function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask, activeTaskId, dragDisabled }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.key });
   const itemIds = useMemo(() => items.map((task) => String(task._id)), [items]);
 
@@ -294,6 +295,7 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
               onDelete={onDelete}
               selectedTaskId={selectedTaskId}
               onSelectTask={onSelectTask}
+              dragDisabled={dragDisabled}
             />
           ))}
         </SortableContext>
@@ -316,9 +318,11 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
 
 const Column = memo(ColumnComponent);
 
-function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask }) {
+function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask, dragDisabled }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: String(task._id),
+    // Prevent reordering when the board is in filtered mode.
+    disabled: dragDisabled,
     animateLayoutChanges: defaultAnimateLayoutChanges,
     transition: {
       duration: 220,
@@ -341,8 +345,8 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...(dragDisabled ? {} : attributes)}
+      {...(dragDisabled ? {} : listeners)}
       className={`transition-[opacity,filter] duration-150 ${isDragging ? "cursor-grabbing opacity-45" : "opacity-100"}`}
     >
       <TaskCard
@@ -351,7 +355,7 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
         onDelete={onDelete}
         selected={isSelected}
         onSelect={() => onSelectTask(task._id)}
-        showDragHandle
+        showDragHandle={!dragDisabled}
         dragging={isDragging}
         isGhost={isDragging}
       />

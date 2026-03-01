@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { toDateInputValue } from "../lib/taskDates.js";
 
 export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("medium");
   const [status, setStatus] = useState("to-do");
+  const [dueDate, setDueDate] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -12,6 +14,7 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
       setDescription(initial?.description || "");
       setPriority(initial?.priority || "medium");
       setStatus(initial?.status || "to-do");
+      setDueDate(toDateInputValue(initial?.dueDate));
     }
   }, [open, initial]);
 
@@ -32,7 +35,13 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
 
   const submit = (e) => {
     e.preventDefault();
-    onSubmit({ title, description, priority, status });
+    onSubmit({
+      title,
+      description,
+      priority,
+      status,
+      dueDate: dueDate || null
+    });
   };
 
   const isSubmitDisabled = !title.trim();
@@ -85,7 +94,7 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div>
               <label className="label" htmlFor="task-priority">
                 Priority
@@ -116,6 +125,19 @@ export default function TaskFormModal({ open, onClose, onSubmit, initial }) {
                 <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
+            </div>
+
+            <div>
+              <label className="label" htmlFor="task-due-date">
+                Due Date
+              </label>
+              <input
+                id="task-due-date"
+                type="date"
+                className="input"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
             </div>
           </div>
 
