@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
 import { useTaskStore } from "../stores/taskStore.js";
 import { useUIStore } from "../stores/uiStore.js";
 import TaskBoard from "../components/TaskBoard.jsx";
 import TaskFormModal from "../components/TaskFormModal.jsx";
+import { isTaskOverdue } from "../lib/taskDates.js";
 
 const sortByPosition = (list) => [...list].sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 const STATUS_LABELS = {
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const { token, user } = useAuthStore();
   const { tasks, loading, error, fetchTasks, addTask, updateTask, deleteTask, applyTaskReorder, reorderTasksPersist } = useTaskStore();
   const { modals, openModal, closeModal, editingTask, setEditingTask, clearEditingTask } = useUIStore();
+  const [showOverdueOnly, setShowOverdueOnly] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -134,6 +136,10 @@ export default function Dashboard() {
     };
   }, [tasks]);
 
+  const overdueCount = useMemo(() => tasks.filter(isTaskOverdue).length, [tasks]);
+  // Filtering to a subset can produce ambiguous list positions, so reorder stays disabled in this mode.
+  const visibleTasks = useMemo(() => (showOverdueOnly ? tasks.filter(isTaskOverdue) : tasks), [showOverdueOnly, tasks]);
+
   const statCards = [
     {
       key: "total",
@@ -187,6 +193,15 @@ export default function Dashboard() {
             <button className="btn" onClick={handleOpenTaskForm}>
               New task
             </button>
+            <label className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/85 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-rose-600"
+                checked={showOverdueOnly}
+                onChange={(event) => setShowOverdueOnly(event.target.checked)}
+              />
+              Show Overdue Only
+            </label>
           </div>
         </div>
 
@@ -199,6 +214,11 @@ export default function Dashboard() {
             </article>
           ))}
         </div>
+
+        <p className="mt-4 text-xs text-slate-600 dark:text-slate-300">
+          Overdue tasks: <span className="font-semibold">{overdueCount}</span>
+          {showOverdueOnly ? " (filter active, drag-and-drop disabled)" : ""}
+        </p>
       </header>
 
       {error && (
@@ -221,11 +241,12 @@ export default function Dashboard() {
         </div>
       ) : (
         <TaskBoard
-          tasks={tasks}
+          tasks={visibleTasks}
           onCreateClick={handleOpenTaskForm}
           onEdit={setEditingTask}
           onDragEnd={handleDragEnd}
           onDelete={handleDeleteTask}
+          dragDisabled={showOverdueOnly}
         />
       )}
 

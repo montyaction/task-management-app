@@ -57,6 +57,8 @@ The application helps users plan, track, and complete work across three core tas
 - Bulk reorder API for smooth DnD persistence
 - Priority levels (`low`, `medium`, `high`)
 - Task status workflow (`to-do`, `in-progress`, `completed`)
+- Task due dates (`dueDate`) with overdue visual highlighting
+- Dashboard overdue-only filter for focused backlog triage
 - User profile management (username, email, avatar URL)
 - Automatic starter task seeding on new user registration
 - Theme switching (`light`, `dark`, `system`)
@@ -195,9 +197,11 @@ task-management-application/
 3. Open `/dashboard` to view your task board.
 4. Create tasks using **New task**.
 5. Click a task to reveal **Edit** and **Delete** actions.
-6. Drag and drop tasks within or across columns to reorder and change status.
-7. Open `/profile` to update username, email, and avatar URL.
-8. Use the theme toggle in the header to switch between `light`, `dark`, and `system`.
+6. Set task due dates from the task form (`Due Date` input).
+7. Use **Show Overdue Only** on dashboard to filter overdue items.
+8. Drag and drop tasks within or across columns to reorder and change status (disabled while overdue-only filter is active).
+9. Open `/profile` to update username, email, and avatar URL.
+10. Use the theme toggle in the header to switch between `light`, `dark`, and `system`.
 
 ## API Endpoints
 
@@ -222,9 +226,9 @@ Base URL (local): `http://localhost:5000`
 
 | Method | Endpoint | Auth | Description |
 | --- | --- | --- | --- |
-| `POST` | `/api/tasks` | Yes | Create task |
+| `POST` | `/api/tasks` | Yes | Create task (`title`, optional `description`, `priority`, `status`, `dueDate`) |
 | `GET` | `/api/tasks` | Yes | List current user tasks |
-| `PUT` | `/api/tasks/:id` | Yes | Update task |
+| `PUT` | `/api/tasks/:id` | Yes | Update task fields (including nullable `dueDate`) |
 | `DELETE` | `/api/tasks/:id` | Yes | Delete task |
 | `PUT` | `/api/tasks/reorder/bulk` | Yes | Bulk update task `status` and `position` |
 

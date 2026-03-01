@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { formatDueDate, isTaskOverdue } from "../lib/taskDates.js";
 
 const PRIORITY_MAP = {
   low: {
@@ -34,6 +35,7 @@ function TaskCard({
   isGhost = false
 }) {
   const priority = PRIORITY_MAP[task.priority] || PRIORITY_MAP.medium;
+  const isOverdue = isTaskOverdue(task);
   const isInteractive = !asOverlay && typeof onSelect === "function";
 
   const handleCardKeyDown = (event) => {
@@ -51,8 +53,12 @@ function TaskCard({
         isInteractive && !dragging && !isGhost ? "cursor-pointer hover:-translate-y-px hover:shadow-md" : ""
       } ${
         selected
-          ? "border-sky-300 ring-2 ring-sky-100 dark:border-sky-500 dark:ring-sky-500/25"
-          : "border-slate-200/90 dark:border-slate-700"
+          ? isOverdue
+            ? "border-rose-300 ring-2 ring-rose-100 dark:border-rose-500/70 dark:ring-rose-500/25"
+            : "border-sky-300 ring-2 ring-sky-100 dark:border-sky-500 dark:ring-sky-500/25"
+          : isOverdue
+            ? "border-rose-300 bg-rose-50/35 dark:border-rose-500/70 dark:bg-rose-950/20"
+            : "border-slate-200/90 dark:border-slate-700"
       } ${dragging && asOverlay ? "scale-[1.01] shadow-2xl" : ""} ${
         isGhost
           ? "border-dashed border-slate-300 bg-slate-100/75 shadow-none dark:border-slate-600 dark:bg-slate-800/45"
@@ -77,6 +83,11 @@ function TaskCard({
           <span className={`rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${priority.className}`}>
             {priority.label}
           </span>
+          {isOverdue && (
+            <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-rose-700 dark:border-rose-500/50 dark:bg-rose-500/15 dark:text-rose-200">
+              Overdue
+            </span>
+          )}
 
           {showDragHandle && (
             <span
@@ -90,6 +101,12 @@ function TaskCard({
           )}
         </div>
       </div>
+
+      {task.dueDate && (
+        <p className={`mt-2 text-xs font-medium ${isOverdue ? "text-rose-700 dark:text-rose-200" : "text-slate-500 dark:text-slate-300"}`}>
+          Due {formatDueDate(task.dueDate)}
+        </p>
+      )}
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs text-slate-500 dark:text-slate-400">{formatUpdatedAt(task.updatedAt)}</p>

@@ -89,3 +89,23 @@
 - Release history, package manifests, and automation must be updated together; treating them separately causes governance drift.
 - CI should execute the same commands used by contributors locally (`npm ci`, lint, test-if-present, build) to reduce integration surprises.
 - Documentation updates are part of maintenance work, not follow-up tasks, especially when release or workflow behavior changes.
+
+## Due Date + Overdue Highlight Rollout (2026-03-01)
+
+### Challenges Faced
+
+- Date-only input from HTML forms (`YYYY-MM-DD`) needed strict parsing to avoid timezone-related drift and invalid calendar values.
+- Overdue filtering introduced a UX/data-consistency edge case where drag-and-drop reorder in a filtered subset could generate incorrect global positions.
+- Card-level overdue visuals needed to stay noticeable without breaking existing priority/status affordances.
+
+### Architecture Decisions
+
+- Added `dueDate: Date | null` to the task model and controller-level parsing/validation for both create and update flows.
+- Added shared frontend date helpers (`frontend/src/lib/taskDates.js`) to keep date formatting and overdue detection logic centralized.
+- Disabled drag-and-drop interactions while **Show Overdue Only** filter is active to preserve ordering integrity.
+
+### Lessons Learned
+
+- Treat date-only values as explicit domain data, not generic timestamps, and validate them early at API boundaries.
+- UI filters that show partial datasets can conflict with reorder semantics; disabling reorder in filtered mode is safer than implicit remapping.
+- Small visual indicators (badge + border tone + due-date text color) improve overdue discoverability without adding dashboard clutter.

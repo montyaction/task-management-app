@@ -8,8 +8,18 @@ Historical versions below were reconstructed from commit milestones because rele
 
 ## [Unreleased]
 
+### Added
+- Added task due-date support (`dueDate`) across task create/update flows and persistence layer.
+- Added overdue task highlighting in task cards, including an explicit `Overdue` badge.
+- Added dashboard-level **Show Overdue Only** filter for quick triage.
+
+### Changed
+- Updated dashboard drag-and-drop behavior to be disabled when overdue-only filtering is active, preventing ambiguous reorder operations on partial task lists.
+- Added task due-date indexing (`user_id + dueDate`) to improve due-date-based query performance.
+
 ### Documentation
 - Consolidated release notes into a single file: `docs/releases/RELEASE_NOTES.md`.
+- Updated implementation docs for due dates and overdue filtering behavior.
 
 ## [1.2.1] - 2026-02-27
 
