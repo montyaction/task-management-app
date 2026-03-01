@@ -107,6 +107,33 @@
   .fade-up {
     animation: fadeUp 0.45s ease-out both;
   }
+
+  .skeleton {
+    @apply relative overflow-hidden bg-slate-200/90 dark:bg-slate-700/70;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      110deg,
+      rgb(248 250 252 / 0) 30%,
+      rgb(255 255 255 / 0.8) 50%,
+      rgb(248 250 252 / 0) 70%
+    );
+    animation: skeletonShimmer 1.35s ease-in-out infinite;
+  }
+
+  .dark .skeleton::after {
+    background: linear-gradient(
+      110deg,
+      rgb(15 23 42 / 0) 30%,
+      rgb(148 163 184 / 0.3) 50%,
+      rgb(15 23 42 / 0) 70%
+    );
+  }
 }
 
 @keyframes fadeUp {
@@ -117,5 +144,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes skeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
   }
 }
