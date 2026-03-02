@@ -10,6 +10,7 @@ This is a full-stack task management application built with the **MERN stack** (
 - Task CRUD operations
 - Real-time task reordering with position persistence
 - Due date tracking with overdue highlighting and overdue-only dashboard filtering
+- Reusable skeleton shimmer loading and first-task empty-state UX on dashboard
 - Responsive design with Tailwind CSS
 - State management with Zustand
 
@@ -457,7 +458,8 @@ Frontend: Re-render board
 
 ### 5. Loading States
 - `loading` flag in stores
-- Dashboard shows "Loading..." while fetching tasks
+- Dashboard renders `TaskBoardSkeleton` (shimmer placeholders) while fetching tasks
+- Dashboard renders a guided empty state with CTA (`Create Your First Task`) when no tasks exist
 - Buttons disabled during async operations
 
 ---

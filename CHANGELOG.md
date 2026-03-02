@@ -14,15 +14,19 @@ Historical versions below were reconstructed from commit milestones because rele
 - Added task due-date support (`dueDate`) across task create/update flows and persistence layer.
 - Added overdue task highlighting in task cards, including an explicit `Overdue` badge.
 - Added dashboard-level **Show Overdue Only** filter for quick triage.
+- Added reusable frontend `Skeleton` component for shimmer-based loading placeholders.
+- Added dashboard empty-state card with CTA (`Create Your First Task`) for first-time users.
 
 ### Changed
 - Standardized automated release behavior to align backend/frontend versions and update `CHANGELOG.md` in release commits.
 - Updated dashboard drag-and-drop behavior to be disabled when overdue-only filtering is active, preventing ambiguous reorder operations on partial task lists.
 - Added task due-date indexing (`user_id + dueDate`) to improve due-date-based query performance.
+- Replaced dashboard task-board loading placeholders with production-style skeleton shimmer UI across all columns.
 
 ### Documentation
 - Consolidated release notes into a single file: `docs/releases/RELEASE_NOTES.md`.
 - Updated implementation docs for due dates and overdue filtering behavior.
+- Updated architecture, README, and learning journal notes for loading-state and empty-state UX improvements.
 
 ## [1.2.1] - 2026-02-27
 

@@ -4,6 +4,8 @@ import { useAuthStore } from "../stores/authStore.js";
 import { useTaskStore } from "../stores/taskStore.js";
 import { useUIStore } from "../stores/uiStore.js";
 import TaskBoard from "../components/TaskBoard.jsx";
+import TaskBoardSkeleton from "../components/TaskBoardSkeleton.jsx";
+import EmptyTaskState from "../components/EmptyTaskState.jsx";
 import TaskFormModal from "../components/TaskFormModal.jsx";
 import { isTaskOverdue } from "../lib/taskDates.js";
 
@@ -228,17 +230,9 @@ export default function Dashboard() {
       )}
 
       {loading ? (
-        <div className="grid gap-4 md:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, idx) => (
-            <div key={idx} className="surface h-56 animate-pulse p-4">
-              <div className="h-4 w-24 rounded bg-slate-200 dark:bg-slate-700" />
-              <div className="mt-4 space-y-3">
-                <div className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800" />
-                <div className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <TaskBoardSkeleton />
+      ) : tasks.length === 0 ? (
+        <EmptyTaskState onCreateClick={handleOpenTaskForm} />
       ) : (
         <TaskBoard
           tasks={visibleTasks}
