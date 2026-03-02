@@ -6,6 +6,7 @@ This file centralizes all tagged releases for the project.
 
 | Version | Date | Tag Target Commit |
 | --- | --- | --- |
+| `v1.3.0` | 2026-03-02 | `d2511fa` |
 | `v1.2.1` | 2026-02-27 | `8d4f907` |
 | `v1.2.0` | 2026-02-26 | `0a50984` |
 | `v1.1.0` | 2026-02-20 | `d17980c` |
@@ -13,6 +14,13 @@ This file centralizes all tagged releases for the project.
 | `v0.3.0` | 2025-11-22 | `ea9cd06` |
 | `v0.2.0` | 2025-09-14 | `0de4462` |
 | `v0.1.0` | 2025-09-11 | `d4aff11` |
+
+## v1.3.0 (2026-03-02)
+
+### Features
+
+- frontend: add reusable skeletons and polished empty task state (`f52c137`)
+- tasks: add due dates and overdue-only filtering (`6c3e24f`)
 
 ## v1.2.1 (2026-02-27)
 
