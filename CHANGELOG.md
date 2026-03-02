@@ -1,3 +1,10 @@
+## [1.3.0](https://github.com/montyaction/task-management-app/compare/v1.2.1...v1.3.0) (2026-03-02)
+
+### Features
+
+* **frontend:** add reusable skeletons and polished empty task state ([f52c137](https://github.com/montyaction/task-management-app/commit/f52c13773f7e3ae9d04333d9418122fcec55dc3e))
+* **tasks:** add due dates and overdue-only filtering ([6c3e24f](https://github.com/montyaction/task-management-app/commit/6c3e24f11cabaeb958ae4b83c084ce4a153a3a38))
+
 # Changelog
 
 All notable changes to this project are documented in this file.
