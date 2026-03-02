@@ -9,11 +9,14 @@ Historical versions below were reconstructed from commit milestones because rele
 ## [Unreleased]
 
 ### Added
+- Added Semantic Release configuration (`.releaserc.json`) to automate SemVer bumping and tag creation from Conventional Commits.
+- Added release automation workflow (`.github/workflows/release.yml`) for automatic version/tag/release generation on `develop`.
 - Added task due-date support (`dueDate`) across task create/update flows and persistence layer.
 - Added overdue task highlighting in task cards, including an explicit `Overdue` badge.
 - Added dashboard-level **Show Overdue Only** filter for quick triage.
 
 ### Changed
+- Standardized automated release behavior to align backend/frontend versions and update `CHANGELOG.md` in release commits.
 - Updated dashboard drag-and-drop behavior to be disabled when overdue-only filtering is active, preventing ambiguous reorder operations on partial task lists.
 - Added task due-date indexing (`user_id + dueDate`) to improve due-date-based query performance.
 

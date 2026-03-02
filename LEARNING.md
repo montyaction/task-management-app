@@ -90,6 +90,24 @@
 - CI should execute the same commands used by contributors locally (`npm ci`, lint, test-if-present, build) to reduce integration surprises.
 - Documentation updates are part of maintenance work, not follow-up tasks, especially when release or workflow behavior changes.
 
+## Automatic Versioning Enablement (2026-03-01)
+
+### Challenges Faced
+
+- Manual tag/version/changelog updates introduced release timing errors and inconsistent metadata between packages.
+- Monorepo release needed a single project version while keeping both workspace manifests in sync.
+
+### Architecture Decisions
+
+- Added Semantic Release config with Conventional Commits rules to compute SemVer bumps automatically.
+- Automated backend/frontend version alignment in release prepare step using `npm version --no-git-tag-version`.
+- Added a dedicated GitHub Actions release workflow on `develop` to create tags, GitHub releases, and changelog updates.
+
+### Lessons Learned
+
+- Release automation should codify team rules (`feat`/`fix`/`BREAKING`) so version bumps are deterministic.
+- Keeping release logic in code (`.releaserc.json`) is more reliable than ad-hoc manual commands.
+
 ## Due Date + Overdue Highlight Rollout (2026-03-01)
 
 ### Challenges Faced
