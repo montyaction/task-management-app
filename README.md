@@ -2,6 +2,8 @@
 
 A full-stack task management platform built with the MERN ecosystem. It provides secure JWT-based authentication, a responsive Kanban-style workflow, drag-and-drop task reordering, profile management, and deployment-ready backend configuration.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0f765998-6a1e-415d-930b-a19f9eef1580/deploy-status)](https://app.netlify.com/projects/task-manager-fend/deploys)
+
 ## Live Links
 
 - [Live Frontend App](https://task-manager-fend.netlify.app/ "Open live frontend in browser")
@@ -286,6 +288,7 @@ Deploy `frontend/` as a static app:
 - Build command: `npm run build`
 - Output directory: `dist`
 - Required env: `VITE_API_URL=<your-backend-origin>`
+- Netlify SPA fallback: keep `frontend/public/_redirects` with `/* /index.html 200` so reloading routes like `/dashboard` does not return `Page not found`.
 - After deployment, update the **Live Links** section at the top of this README with your production URLs.
 
 ### Option 3: Docker Compose (Local Backend Container)
