@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/montyaction/task-management-app/compare/v1.3.0...v1.3.1) (2026-03-03)
+
+### Bug Fixes
+
+* **frontend:** add netlify SPA redirect fallback ([c8bc140](https://github.com/montyaction/task-management-app/commit/c8bc140d94945678156d6a382c06ffd50c334ced))
+
 ## [1.3.0](https://github.com/montyaction/task-management-app/compare/v1.2.1...v1.3.0) (2026-03-02)
 
 ### Features
