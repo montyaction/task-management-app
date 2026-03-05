@@ -5,7 +5,7 @@ import UserAvatar from "./UserAvatar.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 
 const navLinkClass = ({ isActive }) =>
-  `rounded-full px-3 py-1.5 text-sm font-semibold transition ${
+  `whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold transition ${
     isActive
       ? "bg-sky-100 text-sky-700 shadow-[inset_0_0_0_1px_rgba(14,165,233,0.2)] dark:bg-sky-500/20 dark:text-sky-200"
       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
@@ -44,7 +44,7 @@ export default function SiteHeader() {
             <p className="hidden text-xs text-slate-500 dark:text-slate-400 sm:block">Focus on clear priorities and smooth delivery.</p>
           </Link>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-2">
             <ThemeToggle />
 
             {token ? (
@@ -91,7 +91,7 @@ export default function SiteHeader() {
                 </div>
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <NavLink to="/login" className={navLinkClass}>
                   Sign in
                 </NavLink>

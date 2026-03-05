@@ -15,12 +15,14 @@ const PrivateRoute = ({ children }) => {
 };
 
 export default function App() {
+  const { token } = useAuthStore();
+
   return (
     <>
       <RouteChangeHandler />
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route
@@ -39,7 +41,7 @@ export default function App() {
               </PrivateRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
         </Route>
       </Routes>
     </>
