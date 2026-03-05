@@ -30,6 +30,9 @@ Historical versions below were reconstructed from commit milestones because rele
 - Added task due-date indexing (`user_id + dueDate`) to improve due-date-based query performance.
 - Replaced dashboard task-board loading placeholders with production-style skeleton shimmer UI across all columns.
 
+### Fixed
+- Fixed Netlify SPA route reload `404` by adding frontend redirect fallback configuration (`frontend/public/_redirects`).
+
 ### Documentation
 - Consolidated release notes into a single file: `docs/releases/RELEASE_NOTES.md`.
 - Updated implementation docs for due dates and overdue filtering behavior.
