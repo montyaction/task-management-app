@@ -29,14 +29,17 @@ Historical versions below were reconstructed from commit milestones because rele
 - Updated dashboard drag-and-drop behavior to be disabled when overdue-only filtering is active, preventing ambiguous reorder operations on partial task lists.
 - Added task due-date indexing (`user_id + dueDate`) to improve due-date-based query performance.
 - Replaced dashboard task-board loading placeholders with production-style skeleton shimmer UI across all columns.
+- Updated DnD activation by pointer type: full-card drag on desktop/fine pointers, drag-handle activation on touch/coarse pointers.
 
 ### Fixed
 - Fixed Netlify SPA route reload `404` by adding frontend redirect fallback configuration (`frontend/public/_redirects`).
+- Fixed mobile page-scroll lock over the task board by allowing vertical pan (`touch-action: pan-y`) on sortable task wrappers.
 
 ### Documentation
 - Consolidated release notes into a single file: `docs/releases/RELEASE_NOTES.md`.
 - Updated implementation docs for due dates and overdue filtering behavior.
 - Updated architecture, README, and learning journal notes for loading-state and empty-state UX improvements.
+- Updated DnD UX docs and README usage notes for the mobile drag-handle + scroll behavior.
 
 ## [1.2.1] - 2026-02-27
 

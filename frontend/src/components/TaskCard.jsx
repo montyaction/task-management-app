@@ -30,6 +30,7 @@ function TaskCard({
   selected = false,
   onSelect,
   showDragHandle = false,
+  dragHandleProps,
   dragging = false,
   asOverlay = false,
   isGhost = false
@@ -90,14 +91,18 @@ function TaskCard({
           )}
 
           {showDragHandle && (
-            <span
-              aria-hidden="true"
+            <button
+              type="button"
+              aria-label={`Drag task ${task.title}`}
               className={`inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-xs leading-none tracking-tight text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 ${
                 dragging ? "cursor-grabbing" : "cursor-grab"
               }`}
+              style={{ touchAction: "none" }}
+              onClick={(event) => event.stopPropagation()}
+              {...dragHandleProps}
             >
               {"\u22EE\u22EE"}
-            </span>
+            </button>
           )}
         </div>
       </div>

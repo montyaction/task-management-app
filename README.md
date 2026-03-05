@@ -54,6 +54,7 @@ The application helps users plan, track, and complete work across three core tas
 - Protected routes and token-based session handling
 - Task CRUD operations (create/read/update/delete)
 - Drag-and-drop task movement and ordering persistence
+- Mobile-safe drag behavior: vertical page scrolling remains available; drag starts from task handle on touch/coarse pointers
 - Bulk reorder API for smooth DnD persistence
 - Priority levels (`low`, `medium`, `high`)
 - Task status workflow (`to-do`, `in-progress`, `completed`)
@@ -223,8 +224,9 @@ task-management-application/
 6. Set task due dates from the task form (`Due Date` input).
 7. Use **Show Overdue Only** on dashboard to filter overdue items.
 8. Drag and drop tasks within or across columns to reorder and change status (disabled while overdue-only filter is active).
-9. Open `/profile` to update username, email, and avatar URL.
-10. Use the theme toggle in the header to switch between `light`, `dark`, and `system`.
+9. On touch devices, start drag from the handle (`⋮⋮`) and swipe on the card body to keep vertical page scrolling responsive.
+10. Open `/profile` to update username, email, and avatar URL.
+11. Use the theme toggle in the header to switch between `light`, `dark`, and `system`.
 
 ## API Endpoints
 

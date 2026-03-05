@@ -9,7 +9,9 @@
 
 ## Newly Implemented Features
 - Added drag handle affordance (`\u22EE\u22EE`) to each card as a movability cue.
-- Kept full-card drag activation so dragging works even when users drag the card body.
+- Updated drag activation by input type:
+  - Desktop/fine pointer keeps full-card drag activation.
+  - Mobile/coarse pointer uses handle-only drag activation to avoid scroll conflicts.
 - Added explicit cursor feedback with `cursor-grab` on drag handles and `cursor-grabbing` while dragging.
 - Added a lifted drag overlay card with stronger elevation.
 - Added a ghost/placeholder look in the source position while an item is in flight.
@@ -18,6 +20,8 @@
 - Improved drop-zone visuals with dashed container borders and stronger per-column hover highlight rings/colors.
 - Added empty-state cue transition from "Drop tasks here" to "Release to drop" when hovered.
 - Added touch/mobile optimization with long-press drag activation.
+- Fixed mobile vertical scroll lock in the board by using `touch-action: pan-y` on sortable card wrappers.
+- Scoped `touch-action: none` to the drag handle only so handle drag remains reliable without blocking page pan gestures.
 - Added explicit drag cancel handling (`onDragCancel`) so Escape cleanly ends drag and clears active drag state.
 - Enabled explicit board auto-scroll during drag.
 - Added custom screen reader instructions for draggable tasks.
@@ -26,6 +30,7 @@
 
 ## Architectural Notes
 - Sensor architecture updated from one `PointerSensor` to `MouseSensor` (`distance: 8`), `TouchSensor` (`delay: 220`, `tolerance: 8`), and `KeyboardSensor` (`sortableKeyboardCoordinates`).
+- Added dynamic pointer-mode switching with `matchMedia("(pointer: coarse)")` to enable handle-only drag on touch devices.
 - `DndContext` now includes explicit `autoScroll`.
 - `DndContext` now coordinates `onDragStart`, `onDragCancel`, and `onDragEnd` to manage active drag state.
 - `DndContext` now has an `accessibility` configuration (`screenReaderInstructions` and custom `announcements`).

@@ -15,6 +15,20 @@ This file centralizes all tagged releases for the project.
 | `v0.2.0` | 2025-09-14 | `0de4462` |
 | `v0.1.0` | 2025-09-11 | `d4aff11` |
 
+## Unreleased
+
+### Changed
+
+- frontend: updated drag activation by pointer type (desktop keeps full-card drag; touch/coarse pointers use drag handle).
+
+### Fixed
+
+- frontend: fixed mobile page-scroll lock in task board by applying `touch-action: pan-y` to sortable card wrappers and restricting `touch-action: none` to drag handles.
+
+### Documentation
+
+- Updated `DRAG_AND_DROP_UX_REPORT.md` and `README.md` with mobile drag-handle + scroll guidance.
+
 ## v1.3.0 (2026-03-02)
 
 ### Features

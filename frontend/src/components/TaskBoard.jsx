@@ -49,10 +49,15 @@ const DROP_ANIMATION = {
   duration: 220,
   easing: "cubic-bezier(0.2, 0.8, 0.2, 1)"
 };
+const COARSE_POINTER_QUERY = "(pointer: coarse)";
 
 function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd, dragDisabled = false }) {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [activeTaskId, setActiveTaskId] = useState(null);
+  const [useHandleDrag, setUseHandleDrag] = useState(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+    return window.matchMedia(COARSE_POINTER_QUERY).matches;
+  });
   const orderedTasks = useMemo(
     () => [...tasks].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)),
     [tasks]
@@ -102,6 +107,25 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd, dragDisa
       setActiveTaskId(null);
     }
   }, [activeTaskId, taskById]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+
+    const mediaQuery = window.matchMedia(COARSE_POINTER_QUERY);
+    const syncDragMode = () => {
+      setUseHandleDrag(mediaQuery.matches);
+    };
+
+    syncDragMode();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", syncDragMode);
+      return () => mediaQuery.removeEventListener("change", syncDragMode);
+    }
+
+    mediaQuery.addListener(syncDragMode);
+    return () => mediaQuery.removeListener(syncDragMode);
+  }, []);
 
   const handleSelectTask = useCallback((taskId) => {
     const nextId = String(taskId);
@@ -239,6 +263,7 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd, dragDisa
             onSelectTask={handleSelectTask}
             activeTaskId={activeTaskId}
             dragDisabled={dragDisabled}
+            useHandleDrag={useHandleDrag}
           />
         ))}
       </div>
@@ -254,7 +279,18 @@ function TaskBoard({ tasks, onEdit, onDelete, onCreateClick, onDragEnd, dragDisa
   );
 }
 
-function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selectedTaskId, onSelectTask, activeTaskId, dragDisabled }) {
+function ColumnComponent({
+  column,
+  items,
+  onCreateClick,
+  onEdit,
+  onDelete,
+  selectedTaskId,
+  onSelectTask,
+  activeTaskId,
+  dragDisabled,
+  useHandleDrag
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: column.key });
   const itemIds = useMemo(() => items.map((task) => String(task._id)), [items]);
 
@@ -296,6 +332,7 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
               selectedTaskId={selectedTaskId}
               onSelectTask={onSelectTask}
               dragDisabled={dragDisabled}
+              useHandleDrag={useHandleDrag}
             />
           ))}
         </SortableContext>
@@ -318,7 +355,7 @@ function ColumnComponent({ column, items, onCreateClick, onEdit, onDelete, selec
 
 const Column = memo(ColumnComponent);
 
-function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask, dragDisabled }) {
+function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelectTask, dragDisabled, useHandleDrag }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: String(task._id),
     // Prevent reordering when the board is in filtered mode.
@@ -330,23 +367,33 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
     }
   });
   const isSelected = selectedTaskId === String(task._id);
+  const shouldAllowPan = dragDisabled || useHandleDrag;
+
+  const sortableInteractionProps = useMemo(() => {
+    if (dragDisabled || useHandleDrag) return {};
+    return { ...attributes, ...listeners };
+  }, [attributes, dragDisabled, listeners, useHandleDrag]);
+
+  const dragHandleProps = useMemo(() => {
+    if (dragDisabled || !useHandleDrag) return undefined;
+    return { ...attributes, ...listeners };
+  }, [attributes, dragDisabled, listeners, useHandleDrag]);
 
   const style = useMemo(
     () => ({
       transform: CSS.Transform.toString(transform),
       transition: transition ?? "transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-      touchAction: "none",
+      touchAction: shouldAllowPan ? "pan-y" : "none",
       willChange: isDragging ? "transform" : undefined
     }),
-    [isDragging, transform, transition]
+    [isDragging, shouldAllowPan, transform, transition]
   );
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...(dragDisabled ? {} : attributes)}
-      {...(dragDisabled ? {} : listeners)}
+      {...sortableInteractionProps}
       className={`transition-[opacity,filter] duration-150 ${isDragging ? "cursor-grabbing opacity-45" : "opacity-100"}`}
     >
       <TaskCard
@@ -356,6 +403,7 @@ function SortableTaskComponent({ task, onEdit, onDelete, selectedTaskId, onSelec
         selected={isSelected}
         onSelect={() => onSelectTask(task._id)}
         showDragHandle={!dragDisabled}
+        dragHandleProps={dragHandleProps}
         dragging={isDragging}
         isGhost={isDragging}
       />
