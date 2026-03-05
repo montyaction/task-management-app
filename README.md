@@ -194,6 +194,8 @@ task-management-application/
 |   |-- .env.example
 |   |-- package.json
 |-- frontend/
+|   |-- public/
+|   |   |-- _redirects         # Netlify SPA route fallback
 |   |-- src/
 |   |   |-- components/
 |   |   |-- pages/
@@ -286,6 +288,7 @@ Deploy `frontend/` as a static app:
 - Build command: `npm run build`
 - Output directory: `dist`
 - Required env: `VITE_API_URL=<your-backend-origin>`
+- Netlify SPA fallback: keep `frontend/public/_redirects` with `/* /index.html 200` so route reloads (for example `/dashboard`) do not return `404`.
 - After deployment, update the **Live Links** section at the top of this README with your production URLs.
 
 ### Option 3: Docker Compose (Local Backend Container)
