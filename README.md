@@ -65,6 +65,9 @@ The application helps users plan, track, and complete work across three core tas
 - User profile management (username, email, avatar URL)
 - Automatic starter task seeding on new user registration
 - Theme switching (`light`, `dark`, `system`)
+- PWA baseline support with web manifest, service worker, install icons, and theme color metadata
+- SEO crawlability defaults via `robots.txt`, `sitemap.xml`, and page-level meta description
+- Reduced mobile layout instability (CLS) through layout/header stabilization and auth-aware route redirects
 - Health endpoint with database connection status
 - Secure defaults: Helmet, CORS allowlist, rate limiting
 
@@ -197,6 +200,11 @@ task-management-application/
 |-- frontend/
 |   |-- public/
 |   |   |-- _redirects         # Netlify SPA route fallback
+|   |   |-- robots.txt         # crawler directives
+|   |   |-- sitemap.xml        # discoverable route index
+|   |   |-- site.webmanifest   # PWA metadata
+|   |   |-- sw.js              # service worker cache shell
+|   |   |-- icons/             # app/install icons (regular + maskable + apple touch)
 |   |-- src/
 |   |   |-- components/
 |   |   |-- pages/
@@ -291,6 +299,7 @@ Deploy `frontend/` as a static app:
 - Output directory: `dist`
 - Required env: `VITE_API_URL=<your-backend-origin>`
 - Netlify SPA fallback: keep `frontend/public/_redirects` with `/* /index.html 200` so route reloads (for example `/dashboard`) do not return `404`.
+- PWA/SEO static assets are served from `frontend/public/` (`site.webmanifest`, `sw.js`, `robots.txt`, `sitemap.xml`, `icons/*`).
 - After deployment, update the **Live Links** section at the top of this README with your production URLs.
 
 ### Option 3: Docker Compose (Local Backend Container)
